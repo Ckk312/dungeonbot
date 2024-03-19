@@ -1,6 +1,12 @@
 // require consts
 // eslint-disable-next-line spaced-comment
 const dotenv = require('dotenv');
+const fs = require('fs').promises;
+const path = require('path');
+const process = require('process');
+const reminderSched = require('./susched.js');
+const {authenticate} = require('@google-cloud/local-auth');
+const {google} = require('googleapis');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 
 dotenv.config();
@@ -16,8 +22,8 @@ client.commands.set(commandList.data.name, commandList);
 
 // run code when client ready once
 client.once(Events.ClientReady, readyClient => {
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-    setTimeout(sendMessage, difference, 'WAKE UP <@115690432351961095> . THE DUNGEON IS OPEN', now);
+    console.log(`Ready! Logged in as ${readyClient.user.tag}`); 
+    setTimeout(reminderSched.sendMessage, reminderSched.findCurrentDifference(), client, 'WAKE UP <@115690432351961095> . THE DUNGEON IS OPEN');
 });
 
 client.on(Events.InteractionCreate, async interaction => {
