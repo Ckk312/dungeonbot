@@ -4,10 +4,9 @@ const dotenv = require('dotenv');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
-const reminderSched = require('./susched.js');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { authenticate } = require('@google-cloud/local-auth');
+const { google } = require('googleapis');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 // enable config for dotenv functionality
 dotenv.config();
@@ -18,41 +17,41 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // Create a list of all commands in client
 client.commands = new Collection();
 
-// add command
-const commandList = require('./commands/utility/schedmatch.js');
-client.commands.set(commandList.data.name, commandList);
+// add commands from directories of commands
+const foldersPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(foldersPath);
 
-// run code when client ready once
-client.once(Events.ClientReady, readyClient => {
-    let msDiff, hour, min, sec;
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+for (const folder of commandFolders) {
+    const commandsPath = path.join(foldersPath, folder);
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-    msDiff = reminderSched.findCurrentDifference();
-    setTimeout(reminderSched.sendMessage, msDiff, client, 'WAKE UP <@115690432351961095>. THE DUNGEON IS OPEN');
-
-    sec = (msDiff / 1000) % 60;
-    min = (msDiff / 60000) % 60;
-    hour = msDiff / (3600000);
-    console.log(`Next Schedule Update in ${hour.toPrecision(3)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec.`);
-});
-
-// event listener for slash-command
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-
-    const command = interaction.client.commands.get(interaction.commandName);
-
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found`);
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+    
+        if ('data' in command && 'execute' in command) {
+            client.commands.set(command.data.name, command);
+        }
+        else {
+            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+        }
     }
+}
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral : true });
+// add events from 'events' directory
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
+    } else {
+        client.on(event.name, (...args) => event.execute(...args));
     }
-});
+}
 
 // Log into Discord
 client.login(process.env.TOKEN);
