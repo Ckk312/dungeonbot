@@ -89,3 +89,8 @@ lerna-debug.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# files to hide
+token.json
+config.json
+googlecalendar/credentials.json
