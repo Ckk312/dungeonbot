@@ -8,6 +8,6 @@ module.exports = {
     data,
     async execute(interaction) {
         
-        await interaction.reply("Hey! You're all checked in now relax.");
+        await interaction.reply(`Hey ${interaction.user.displayName}! You're all checked in now relax.`);
     },
 };
