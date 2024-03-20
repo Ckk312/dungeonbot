@@ -54,6 +54,5 @@ for (const file of eventFiles) {
 
 activate();
 
-
 // Log into Discord
 client.login(process.env.TOKEN);
