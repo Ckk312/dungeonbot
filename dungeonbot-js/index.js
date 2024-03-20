@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const fs = require('node:fs');
 const path = require('node:path');
 const process = require('process');
-const { activate } = require('./googlecalendar/googleapi.jsar/googleapi.js');
+const { activate } = require('./googlecalendar/googleapi.js');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 // enable config for dotenv functionality
