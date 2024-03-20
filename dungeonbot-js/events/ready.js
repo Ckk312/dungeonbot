@@ -6,7 +6,7 @@ module.exports = {
     once: true,
     execute(client) {
         let msDiff, hour, min, sec;
-        console.log(`Ready! Logged in as ${readyClient.user.tag}`);
+        console.log(`Ready! Logged in as ${client.user.tag}`);
 
         msDiff = reminderSched.findCurrentDifference();
         setTimeout(reminderSched.sendMessage, msDiff, client, 'WAKE UP <@115690432351961095>. THE DUNGEON IS OPEN');

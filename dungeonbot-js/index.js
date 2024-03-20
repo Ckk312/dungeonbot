@@ -1,11 +1,10 @@
 // require consts
 // eslint-disable-next-line spaced-comment
 const dotenv = require('dotenv');
-const fs = require('fs').promises;
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const process = require('process');
-const { authenticate } = require('@google-cloud/local-auth');
-const { google } = require('googleapis');
+const { activate } = require('./googlecalendar/googleapi.jsar/googleapi.js');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 // enable config for dotenv functionality
@@ -19,7 +18,7 @@ client.commands = new Collection();
 
 // add commands from directories of commands
 const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const commandFolders = fs.readdirSync(foldersPath).filter(file => file.endsWith('.js'));
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
@@ -52,6 +51,8 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
+
+activate();
 
 // Log into Discord
 client.login(process.env.TOKEN);
