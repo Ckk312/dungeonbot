@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const data = new SlashCommandBuilder()
 
-    .setName('reserve') // /reserveDungeon
+    .setName('reserve') // /reserve
     .setDescription('Reserve the dungeon for a specific date')
     
     .addIntegerOption(option =>
