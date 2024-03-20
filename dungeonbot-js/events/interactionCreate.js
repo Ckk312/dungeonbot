@@ -5,6 +5,9 @@ module.exports = {
     async execute(interaction) {
         if (!interaction.isChatInputCommand()) return;
 
+        for (const command of interaction.client.commands) {
+            console.log(command);
+        }
         const command = interaction.client.commands.get(interaction.commandName);
 
         if (!command) {
