@@ -18,7 +18,7 @@ client.commands = new Collection();
 
 // add commands from directories of commands
 const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath).filter(file => file.endsWith('.js'));
+const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
