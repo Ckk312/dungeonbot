@@ -75,11 +75,11 @@ async function listEvents(auth) {
   let timeStart = new Date();
   let timeEnd, ret;
   switch (timeStart.getDay()) {
-    case 5:
+    case 6:
       timeStart = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 9);
       timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 23, 59, 59);
       break;
-    case 6:
+    case 0:
       timeStart = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 11);
       timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 21, 59, 59);
       break;
