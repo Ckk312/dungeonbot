@@ -71,7 +71,7 @@ async function authorize() {
  */
 
 async function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: 'v3', auth });
   let timeStart = new Date();
   let timeEnd, ret;
   switch (timeStart.getDay()) {
@@ -94,7 +94,7 @@ async function listEvents(auth) {
     timeMax: timeEnd,
     maxResults: 10,
     singleEvents: true,
-    orderBy: 'startTime'
+    orderBy: 'startTime',
   });
   const events = res.data.items;
   if (!events || events.length === 0) {
@@ -102,7 +102,7 @@ async function listEvents(auth) {
     return;
   } else {
     ret = events.map((event) => {
-      let string = `Reservation \"${event.summary()}\"
+      const string = `Reservation "${event.summary()}"
       From ${event.start.dateTime()}
       To ${event.end.dateTime()}`;
       return string;
@@ -115,5 +115,5 @@ async function listEvents(auth) {
 
 module.exports = {
     authorize,
-    listEvents
+    listEvents,
 };

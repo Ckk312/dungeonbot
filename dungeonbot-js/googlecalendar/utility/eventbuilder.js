@@ -10,7 +10,7 @@ const gCalEvent = {
         dateTime: null,
         timeZone : 'America/New York'
     },
-    endTimeUnspecified: false,
+    endTimeUnspecified: true,
     anyoneCanAddSelf : false,
     attendeesOmitted : true,
     reminders : {
@@ -70,7 +70,7 @@ class EventBuilder {
         this.description = match.description;
         this.setSummary(match.summary);
         this.setStartTime(match.start);
-        this.setEndTime(match.end);
+        this.setEndTime(new Date(match.start.getFullYear(), match.start.getMonth(), match.start.getDate(), match.start.getHour() + 1, match.start.getMinute() + 30).toISOString());
     }
     /**
     * Builds an event object and returns it

@@ -7,22 +7,22 @@ const { authorize } = require('../../googlecalendar/googleapi.js');
 const data = new SlashCommandBuilder()
     .setName('schedmatch')
     .setDescription('Schedule an upcoming Match')
-    .addStringOption(option => 
+    .addStringOption(option =>
         option
             .setName('game')
             .setDescription('The game for which this match is for')
             .setRequired(true)
             .addChoices(
-                {name: 'Apex Legends', value: 'al'},
-                {name: 'Call of Duty', value: 'cod'},
-                {name: 'Counterstrike', value: 'cs'},
-                {name: 'League of Legends', value: 'lol'},
-                {name: 'Overwatch', value: 'ow'},
-                {name: 'Rainbow Six: Siege', value: 'r6'},
-                {name: 'Rocket League', value: 'rl'},
-                {name: 'Splatoon', value: 'spl'},
-                {name: 'Super Smash Bros.', value: 'ssb'},
-                {name: 'Valorant', value: 'val'}
+                { name: 'Apex Legends', value: 'al' },
+                { name: 'Call of Duty', value: 'cod' },
+                { name: 'Counterstrike', value: 'cs' },
+                { name: 'League of Legends', value: 'lol' },
+                { name: 'Overwatch', value: 'ow' },
+                { name: 'Rainbow Six: Siege', value: 'r6' },
+                { name: 'Rocket League', value: 'rl' },
+                { name: 'Splatoon', value: 'spl' },
+                { name: 'Super Smash Bros.', value: 'ssb' },
+                { name: 'Valorant', value: 'val' },
             ))
     .addIntegerOption(option =>
         option
@@ -87,8 +87,8 @@ const data = new SlashCommandBuilder()
             .setDescription('Enter the link for anyone who plans on streaming the match'));
 
 // execute function
-async function execute(interaction) { 
-    // set the hour based on am or pm  
+async function execute(interaction) {
+    // set the hour based on am or pm
     let hour = interaction.options.getInteger('hour');
     if (interaction.options.getString('am-pm') === 'pm') {
         hour += 12;
@@ -96,7 +96,7 @@ async function execute(interaction) {
 
     // take the current date to find the year and construct a new date with given information
     const date = new Date();
-        
+
     const dateStr = new Date(date.getFullYear(), (interaction.options.getInteger('month') - 1), interaction.options.getInteger('day'),
         hour, interaction.options.getInteger('minute'));
 
@@ -108,38 +108,38 @@ async function execute(interaction) {
         eventLeague: interaction.options.getString('event-league'),
         opponent: interaction.options.getString('opponent'),
         bracket: interaction.options.getString('bracket-link'),
-        stream: interaction.options.getString('stream-link')
-    }
+        stream: interaction.options.getString('stream-link'),
+    };
 
     // string to reply with and it's editions
     let replyStr = `\`\`\`yaml\nDate/Time: ${dateStr.toString()} <t:${dateStr.getTime()}:F>\nTitle: ${matchInfo.title}
         \nEvent/League and Description: ${matchInfo.eventLeague}\nOpponent: ${matchInfo.opponent}\nBracket: ${matchInfo.bracket}\nStream:`;
-        
+
     if (matchInfo.stream) {
         replyStr += ` ${matchInfo.stream}\n`;
     }
-        
+
     replyStr += '```';
-        
+
     // button configuration
     const confirm = new ButtonBuilder()
         .setCustomId('confirm')
         .setLabel('Confirm Match')
         .setStyle(ButtonStyle.Success);
-                
+
     const deny = new ButtonBuilder()
         .setCustomId('deny')
         .setLabel('Make Changes')
         .setStyle(ButtonStyle.Danger);
-        
+
     const confirmationRow = new ActionRowBuilder()
         .addComponents(confirm, deny);
-              
+
     // respond and adapt based on button presses
     const response = await interaction.reply({
         content: `Is this correct?\n${replyStr}`,
         components: [confirmationRow],
-        ephemeral: true 
+        ephemeral: true,
     });
 
     try {
@@ -152,23 +152,28 @@ async function execute(interaction) {
             authorize().then((a) => {
                 return {
                     auth: a,
-                    eventResource: eb.build()
+                    eventResource: eb.build(),
                 };
             }).then(createEvent);
+            interaction.editReply({
+                content: 'event made',
+                components: [],
+                ephemeral: true,
+            });
         }
         else if (confirmation.customId === 'deny') {
-            await confirmation.update( {
+            await confirmation.update({
                 content: 'Command cancelled.\nPlease re-enter the command to continue.',
                 components: [],
-                ephemeral: true
+                ephemeral: true,
             });
         }
     } catch (e) {
         console.log(e);
-        await interaction.editReply( {
+        await interaction.editReply({
             content: 'Confirm action timeout.\nPlease re-enter the command to continue.',
             components: [],
-            ephemeral: true
+            ephemeral: true,
         });
     }
 }
