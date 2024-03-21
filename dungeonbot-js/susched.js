@@ -94,7 +94,7 @@ async function sendMessage(client, schedule) {
     sec = (difference / 1000) % 60;
     min = (difference / 60000) % 60;
     hour = difference / (3600 * 6000);
-    console.log(`Next Schedule Update in ${hour.toPrecision(2)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec ...`);
+    console.log(`Next Schedule Update in ${hour.toPrecision(3)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec ...`);
 }
 
 // list of exports
