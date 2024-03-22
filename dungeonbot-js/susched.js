@@ -29,7 +29,7 @@ function friday(time) {
 // function in case the day is saturday
 function saturday(time) {
     let dayInc;
-    if (time.getDay() != 5) {
+    if (time.getDay() != 6) {
         return;
     }
 
@@ -43,7 +43,8 @@ function saturday(time) {
 // constant variables for no. of seconds in a day
 // or day plus 2 hours
 const day = 86400 * 1_000;
-const dayPlus2Hours = (86400 + 3600) * 1_000;
+const dayPlus2Hours = (86400 + 7200) * 1_000;
+const dayMinus4Hours = (86400 - 14400) * 1_000;
 let difference;
 
 // find the difference between now and the next 
@@ -83,9 +84,13 @@ async function sendMessage(client, schedule) {
         .get('763248812558778378');
     channel.send(schedule);
 
-    if (date.getDay() == 5 || date.getDay() == 6) {
+    if (date.getDay() == 4 || date.getDay() == 5) {
         difference = dayPlus2Hours;
-    } else {
+    } 
+    else if (date.getDay() == 6) {
+        difference = dayMinus4Hours;
+    } 
+    else {
         difference = day;
     }
 

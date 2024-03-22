@@ -1,35 +1,22 @@
-const gCalEvent = {
-    summary: null,
-    description: null,
-    location: null,
-    start : {
-        dateTime: null,
-        timeZone : 'America/New York'
-    },
-    end : {
-        dateTime: null,
-        timeZone : 'America/New York'
-    },
-    endTimeUnspecified: true,
-    anyoneCanAddSelf : false,
-    attendeesOmitted : true,
-    reminders : {
-        useDefault : true
-    }
-}
-
 class EventBuilder {
-    summary = null;
-    description = null;
-    start = null;
-    end = null;
+    gCalEvent;
+
+    constructor(gCalEvent = {}) {
+        this.gCalEvent = { ...gCalEvent };
+        this.gCalEvent.anyoneCanAddSelf = false;
+        this.gCalEvent.reminders = {
+            useDefault : true,
+        }
+        return this;
+    }
+
     /**
      * Attaches summary to builder
      * 
      * @param { string } summary
      */
     setSummary(summary) {
-        this.summary = summary;
+        this.gCalEvent.summary = summary;
         return this;
     }
 
@@ -39,50 +26,74 @@ class EventBuilder {
      * @param { string } description
      */
     setDescription(description) {
-        this.description = description;
+        this.gCalEvent.description = description;
         return this;
     }
+
     /**
      * Attaches a start time to builder
      * 
      * @param { Date } date
      */
     setStartTime(date) {
-        if (!(date instanceof Date) || isNaN(date)) {
-            throw new Error('not a date');
+        let dateFormat = (date).slice(0, 19) + '-00:00';
+        this.gCalEvent.start = {
+            dateTime : dateFormat,
+            timeZone : 'America/New_York',
         }
-        this.start = date;
+        return this;
     }
 
     /**
      * Attaches an end time to builder
      * 
-     * @param { Date } date
+     * @param { string } date
      */
     setEndTime(date) {
-        if (!(date instanceof Date) || isNaN(date)) {
-            throw new Error ('not a date');
+        let dateFormat = (date).slice(0, 19) + '-00:00';
+        this.gCalEvent.end = {
+            dateTime : dateFormat,
+            timeZone : 'America/New_York',
         }
-        this.end = date;
+        return this;
     }
 
+    /**
+     * DOES NOT INCLUDE START AND END DATE. Only includes other match information.
+     * 
+     * @param { Object } match 
+     * @returns 
+     */
     setMatchInfo(match) {
-        this.description = match.description;
-        this.setSummary(match.summary);
-        this.setStartTime(match.start);
-        this.setEndTime(new Date(match.start.getFullYear(), match.start.getMonth(), match.start.getDate(), match.start.getHour() + 1, match.start.getMinute() + 30).toISOString());
+        let description = `UCF Knights vs ${match.opponent} in ${match.eventLeague}.\nBracket found <a href="${match.bracket}">here</a>.`;
+        if (match.stream) {
+            description += `\nStream <a href="${match.stream}">here</a>.`;
+        }
+        this.setDescription(description);
+
+        let summary = `[${match.game.toUpperCase()}] Knights vs ${match.opponent}`;
+        this.setSummary(summary);
+
+        return this;
     }
+
+    /**
+     * DOES NOT INCLUDE START AND END DATE. Only includes summary and description
+     * 
+     * @param { Object } eventInfo must have summary and description in object
+     */
+    setEventInfo(eventInfo) {
+        this.setSummary(eventInfo.summary);
+        this.setDescription(eventInfo.description);
+    }
+
     /**
     * Builds an event object and returns it
     * 
     * @return { gCalEvent }
     */
-    build() {
-        gCalEvent.summary = this.summary;
-        gCalEvent.description = this.description;
-        gCalEvent.start.dateTime = this.start;
-        gCalEvent.end.dateTime = this.end;
-        return gCalEvent;
+    toJSON() {
+        return { ...this.gCalEvent };
     }
 }
 
