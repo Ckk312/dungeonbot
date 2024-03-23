@@ -2,44 +2,62 @@ const { authorize } = require('./googlecalendar/googleapi.js');
 const { listEvents } = require('./googlecalendar/utility/listevents.js');
 
 // function in case of most days
-function normalDay(time) {
-    let dayInc = 0;
-    if (time.getDay() == 5 || time.getDay() == 6) {
+function weekDay(time) {
+    let dayInc, hour;
+    if (time.getDay() == 6 || time.getDay() == 0) {
         return;
     }
 
-    dayInc = time.getHours() < 7 ? 0:1;
+    if (time.getDay() < 7) {
+        dayInc = 0;
+        hour = 7;
+    } else {
+        dayInc = 1;
+        hour = time.getDay() == 5 ? 9:7;
+    }
 
     const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 7);
+        time.getMonth(), time.getDate() + dayInc, hour);
     return nextDay;
 }
 
 // function in case the day is friday
-function friday(time) {
-    let dayInc;
-    if (time.getDay() != 5) {
-        return;
-    }
-
-    dayInc = time.getHours() < 9 ? 0:1;
-
-    const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 9);
-    return nextDay;
-}
-
-// function in case the day is saturday
 function saturday(time) {
-    let dayInc;
+    let dayInc, hour;
     if (time.getDay() != 6) {
         return;
     }
 
-    dayInc = time.getHours() < 11 ? 0:1;
+    if (time.getHours() < 9) {
+        dayInc = 0;
+        hour = 9;
+    } else {
+        dayInc = 1;
+        hour = 11;
+    }
 
     const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 11);
+        time.getMonth(), time.getDate() + dayInc, hour);
+    return nextDay;
+}
+
+// function in case the day is saturday
+function sunday(time) {
+    let dayInc, hour;
+    if (time.getDay() != 0) {
+        return;
+    }
+
+    if (time.getHours() < 11) {
+        dayInc = 0;
+        hour = 11;
+    } else {
+        dayInc = 1;
+        hour = 7;
+    }
+
+    const nextDay = new Date(time.getFullYear(), 
+        time.getMonth(), time.getDate() + dayInc, hour);
     return nextDay;
 }
 
@@ -58,8 +76,8 @@ function findCurrentDifference() {
     let tmrOpening;
 
     switch (currentDay) {
-        case 5:
-            tmrOpening = friday(now);
+        case 0:
+            tmrOpening = sunday(now);
             break;
 
         case 6:
@@ -67,7 +85,7 @@ function findCurrentDifference() {
             break;
 
         default:
-            tmrOpening = normalDay(now);
+            tmrOpening = weekDay(now);
             break;
     }
 
@@ -89,23 +107,23 @@ async function sendMessage(client, schedule) {
         .get('763248812558778378');
     channel.send(schedule);
 
-    if (date.getDay() == 4 || date.getDay() == 5) {
+    if (date.getDay() == 5 || date.getDay() == 6) {
         difference = dayPlus2Hours;
     } 
-    else if (date.getDay() == 6) {
+    else if (date.getDay() == 0) {
         difference = dayMinus4Hours;
     } 
     else {
         difference = day;
     }
 
-    const newMessage = createMessage(authorize().then((auth) => {
-        return {
-            auth,
-            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-            date: new Date(),
-        }
-    }).then(listEvents).catch(console.error()));
+    info = {
+        auth: authorize(),
+        calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+        date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+    }
+
+    const newMessage = createMessage(listEvents(info)).catch(console.error());
 
     setTimeout(sendMessage, difference, client, newMessage);
 

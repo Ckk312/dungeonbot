@@ -9,16 +9,17 @@ module.exports = {
     once: true,
     async execute(client) {
         let msDiff, hour, min, sec;
+        today = new Date();
         console.log(`Ready! Logged in as ${client.user.tag}`);
 
         // start recursive daily function
         date = reminderSched.findCurrentDifference();
-        msDiff = date.getTime() - new Date().getTime();
-        let eventList = await authorize().then((a) => {
+        msDiff = date.getTime() - today.getTime();
+        const eventList = await authorize().then((a) => {
             return {
                 auth: a,
                 calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-                date: date,
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
             }
         }).then(listEvents).catch(console.error());
 

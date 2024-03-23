@@ -3,43 +3,38 @@ const { EmbedBuilder } = require('discord.js');
 /**
  * Creates an embedded message based on information given
  * 
- * @param {[*]} eventList 
+ * @param { [*] } eventList 
  * @returns 
  */
 function createMessage(eventList) {
     // base embed
+    date = new Date();
     eb = new EmbedBuilder()
         .setTitle('Today\'s Reservations')
-        .setDescription('List of all Dungeon Reservations for ' + new Date().toUTCString());
+        .setDescription('List of all Dungeon Reservations for **' + date.toDateString() + '.**');
 
     // add fields based on array size
     try {
-        let counter = 0;
         for (const event of eventList) {
             let string, message;
-            string += '**Beginning at:** ' + event.start.dateTime + '\n**Ending at:** ' + event.end.dateTime + '\n' + event.description;
-            if ((counter % 3) === 0) {
-                message = {
-                    name : '\u200b',
-                    value : '\u200b',
-                }
-            } else {
-                message = {
-                    name : event.summary,
-                    value : string,
-                }
+            string = '**Beginning at:** <t:' + (new Date(event.start.dateTime).getTime() / 1000) + ':t>' +
+                '\n**Ending at:** <t:' + (new Date(event.end.dateTime).getTime() / 1000) + ':t>\n*' + event.description + '*';
+
+            message = {
+                name : '**__' + event.summary + '__**',
+                value : string,
             }
             eb.addFields(message);
             counter++;
         }
     } catch (e) {
         console.log(e);
-        eb.addFields({ name: 'NO EVENTS ARE SCHEDULED FOR TODAY', value: ' ' });
+        eb.addFields({ name: '**__NO EVENTS ARE SCHEDULED FOR TODAY__**', value: ' ' });
     }
         
     eb.addFields({ name: '**REMEMBER**', value: 'Teams with a reservation have the right to ask you to leave. ' + 
-        'Try not to enter the dungeon while they are playing!', })
-        .setFooter({ text: 'Contact the General Manager, an Officer, or Junior Officers for any questions for reservations' });
+        '\nTry not to enter the dungeon while they are playing!', })
+        .setFooter({ text: 'Contact the General Manager, an Officer, or Junior Officers for any questions about reservations' });
         
     return { embeds: [eb] }; 
 }
