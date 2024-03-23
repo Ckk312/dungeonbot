@@ -2,7 +2,6 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed
 const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
 const { createEvent } = require('../../googlecalendar/utility/eventcreate.js');
 const { authorize } = require('../../googlecalendar/googleapi.js');
-const { jobs } = require('googleapis/build/src/apis/jobs/index.js');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
@@ -164,7 +163,7 @@ async function execute(interaction) {
     }
 
     // string to reply with and it's editions
-    let replyStr = `\`\`\`yaml\nDate/Time: ${date.toString()} <t:${date.getTime()}:F>\nTitle: ${matchInfo.title}
+    let replyStr = `\`\`\`yaml\nDate/Time: ${date.toString()} <t:${date.getTime() / 1000}:F>\nTitle: ${matchInfo.title}
         \nEvent/League and Description: ${matchInfo.eventLeague}\nOpponent: ${matchInfo.opponent}\nBracket: ${matchInfo.bracket}\nSocials:`;
 
     if (matchInfo.socials) {
@@ -215,9 +214,13 @@ async function execute(interaction) {
 
     // confirm button case
     if (confirmation?.customId === 'confirm') {
-        // google stuff
+        // google api calendar
+        const assets = await loadTitleAssets(matchInfo.game);
         const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), (date.getHours() + 2), date.getMinutes());
-        const eb = new EventBuilder()
+
+        // post to all matches calendar
+        let eb = new EventBuilder()
+            .setGeneral()
             .setMatchInfo(matchInfo)
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
@@ -225,10 +228,20 @@ async function execute(interaction) {
             calendarId: '309c74357dd09db96919f94f3f07dae0ae1a331bbf00fd32a1cb7b3e81acb9e8@group.calendar.google.com',
             eventResource: eb.toJSON(),
         }
-        const eventExist = authorize().then((a) => {
+        const eventExist = await authorize().then((a) => {
             info.auth = a;
             return info;
         }).then(createEvent).catch(console.error);
+
+        // post to specific games' calendar
+        info.calendarId = assets.calendar;
+        eb = new EventBuilder()
+            .setMatchInfo(matchInfo)
+            .setStartTime(date.toISOString())
+            .setEndTime(newDate.toISOString());
+        info.eventResource = eb.toJSON();
+        await createEvent(info).catch(console.error);
+
         // respond based on google calendar api
         if (eventExist) {
             interaction.editReply({
@@ -236,21 +249,19 @@ async function execute(interaction) {
                 components: [],
                 ephemeral: true,
             });
-            const assets = await loadTitleAssets(matchInfo.game);
-            console.log(date.getTime());
             const matchEmbed = new EmbedBuilder()
                 .setColor(assets.colorHex)
                 .setTitle(matchInfo.title)
-                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                 .setDescription('**Match for ' + assets.fullName + '**\n on: <t:' + date.getTime() / 1000 + ':F>')
                 .setThumbnail(assets.picURL)
                 .addFields(
                     { name: '\u200B', value: '\u200B' },
-                    { name: 'Match Up', value: matchInfo.team + '\nvs\n' + matchInfo.opponent, inline: true },
-                    { name: 'Event/League', value: matchInfo.eventLeague, inline: true },
+                    { name: 'Match Up', value: '**' + matchInfo.team + '**\n*vs*\n**' + matchInfo.opponent + '**', inline: true },
+                    { name: 'Event/League', value: '*' + matchInfo.eventLeague + '*', inline: true },
                     { name: 'Bracket' , value: matchInfo.bracket, inline: true },
                     { name: '\u200B', value: '\u200B' },
                 )
+                .setFooter({ text: 'Created by ' + interaction.user.username, iconURL: interaction.user.displayAvatarURL(), })
                 .setTimestamp();
             if (matchInfo.stream) {
                 matchEmbed.addFields(
@@ -259,12 +270,12 @@ async function execute(interaction) {
             }
             if (matchInfo.socials) {
                 matchEmbed.addFields(
-                    { name: 'Opponent Socials', value: matchInfo.socials, inline: true, }
+                    { name: 'Opponent Socials', value: '*' + matchInfo.socials + '*', inline: true, }
                 );
             }
             if (matchInfo.hashtags) {
                 matchEmbed.addFields(
-                    { name: 'Relevant Hashtags', value: matchInfo.hashtags, inline: true, }
+                    { name: 'Relevant Hashtags', value: '**' + matchInfo.hashtags + '**', inline: true, }
                 );
             }
             await interaction.channel.send({ embeds: [matchEmbed], });
@@ -276,6 +287,7 @@ async function execute(interaction) {
             })
         }
     }
+
     // deny button case
     else if (confirmation?.customId === 'deny') {
         await confirmation.update({

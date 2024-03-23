@@ -65,55 +65,6 @@ async function authorize() {
   return client;
 }
 
-/**
- * Lists the next 10 events on calendar.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-
-async function listEvents(auth) {
-  const calendar = google.calendar({ version: 'v3', auth });
-  let timeStart = new Date();
-  let timeEnd, ret;
-  switch (timeStart.getDay()) {
-    case 6:
-      timeStart = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 9);
-      timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 23, 59, 59);
-      break;
-    case 0:
-      timeStart = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 11);
-      timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 21, 59, 59);
-      break;
-    default:
-      timeStart = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 7);
-      timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 23, 59, 59);
-      break;
-  }
-  const res = await calendar.events.list({
-    calendarId : '309c74357dd09db96919f94f3f07dae0ae1a331bbf00fd32a1cb7b3e81acb9e8@group.calendar.google.com',
-    timeMin: timeStart,
-    timeMax: timeEnd,
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  });
-  const events = res.data.items;
-  if (!events || events.length === 0) {
-    console.log('No upcoming events found.');
-    return;
-  } else {
-    ret = events.map((event) => {
-      const string = `Reservation "${event.summary()}"
-      From ${event.start.dateTime()}
-      To ${event.end.dateTime()}`;
-      return string;
-    });
-    console.log(`Upcoming Events for ${timeStart.toDateString()} documented.`);
-
-    return ret;
-  }
-}
-
 module.exports = {
     authorize,
-    listEvents,
 };

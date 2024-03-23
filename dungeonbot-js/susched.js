@@ -1,3 +1,6 @@
+const { authorize } = require('./googlecalendar/googleapi.js');
+const { listEvents } = require('./googlecalendar/utility/listevents.js');
+
 // function in case of most days
 function normalDay(time) {
     let dayInc = 0;
@@ -73,8 +76,12 @@ function findCurrentDifference() {
     return difference;
 }
 
-// send message and then recurse the function with 
-// a delay
+/**
+ * Sends message and recurses with delay
+ * 
+ * @param {*} client Discord client instance
+ * @param { string } schedule Message string
+ */
 async function sendMessage(client, schedule) {
     let sec, min, hour;
     const date = new Date();
@@ -94,7 +101,15 @@ async function sendMessage(client, schedule) {
         difference = day;
     }
 
-    setTimeout(sendMessage, difference, client, schedule);
+    const newMessage = createMessage(authorize().then((auth) => {
+        return {
+            auth,
+            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+            date: new Date(),
+        }
+    }).then(listEvents).catch(console.error()));
+
+    setTimeout(sendMessage, difference, client, newMessage);
 
     sec = (difference / 1000) % 60;
     min = (difference / 60000) % 60;

@@ -7,6 +7,15 @@ class EventBuilder {
         this.gCalEvent.reminders = {
             useDefault : true,
         }
+        this.gCalEvent.general = false;
+        return this;
+    }
+
+    /**
+     * Creates a general boolean to identify as being general
+     */
+    setGeneral() {
+        this.gCalEvent.general = true;
         return this;
     }
 
@@ -61,17 +70,28 @@ class EventBuilder {
     /**
      * DOES NOT INCLUDE START AND END DATE. Only includes other match information.
      * 
-     * @param { Object } match 
-     * @returns 
+     * @param { Object } match Object that includes match information
+     * @returns
      */
     setMatchInfo(match) {
-        let description = `UCF Knights vs ${match.opponent} in ${match.eventLeague}.\nBracket found <a href="${match.bracket}">here</a>.`;
+        let description = `${match.team} vs ${match.opponent} in ${match.eventLeague}.\nBracket found <a href="${match.bracket}">here</a>.`;
         if (match.stream) {
             description += `\nStream <a href="${match.stream}">here</a>.`;
         }
+        if (match.socials) {
+            description += `\n${match.socials}`;
+        }
+        if (match.hashtags) {
+            description += ` ${match.hashtags}`;
+        }
         this.setDescription(description);
 
-        let summary = `[${match.game.toUpperCase()}] Knights vs ${match.opponent}`;
+        let summary;
+        if (this.gCalEvent.general) {
+            summary = `[${match.game.toUpperCase()}] `
+        }
+
+        summary += `UCF vs ${match.opponent}`;
         this.setSummary(summary);
 
         return this;

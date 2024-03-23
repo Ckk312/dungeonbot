@@ -1,4 +1,3 @@
-const match = require('./eventbuilder.js');
 const { google } = require('googleapis');
 
 /**
@@ -8,7 +7,9 @@ const { google } = require('googleapis');
  * (object created with gCal information)
  */
 async function createEvent(info) {
+    // create calendar instance
     const calendar = google.calendar({ version: 'v3', auth: info.auth });
+    // insert event into calendar
     calendar.events.insert({
         auth: info.auth,
         calendarId: info.calendarId,
