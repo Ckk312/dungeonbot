@@ -12,8 +12,8 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag}`);
 
         // start recursive daily function
-        msDiff = reminderSched.findCurrentDifference();
-        date = new Date();
+        date = reminderSched.findCurrentDifference();
+        msDiff = date.getTime() - new Date().getTime();
         let eventList = await authorize().then((a) => {
             return {
                 auth: a,

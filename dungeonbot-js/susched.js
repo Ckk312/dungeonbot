@@ -71,9 +71,7 @@ function findCurrentDifference() {
             break;
     }
 
-    difference = tmrOpening.getTime() - now.getTime();
-
-    return difference;
+    return tmrOpening;
 }
 
 /**
