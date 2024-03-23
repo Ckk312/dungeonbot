@@ -34,10 +34,10 @@ function createMessage(eventList) {
         }
     } catch (e) {
         console.log(e);
-        eb.addFields({ name: 'NO EVENTS ARE SCHEDULED FOR TODAY', value: 'hi' });
+        eb.addFields({ name: 'NO EVENTS ARE SCHEDULED FOR TODAY', value: ' ' });
     }
         
-    eb.addFields({ name: '**REMEMBER**', value: 'Teams with a reservation have the right to ask you to leave.' + 
+    eb.addFields({ name: '**REMEMBER**', value: 'Teams with a reservation have the right to ask you to leave. ' + 
         'Try not to enter the dungeon while they are playing!', })
         .setFooter({ text: 'Contact the General Manager, an Officer, or Junior Officers for any questions for reservations' });
         
