@@ -73,13 +73,21 @@ module.exports = {
             endHour += 12;
         }
 
+        if(startHour < 10){
+            var hourStarted = '0' + Integer.toString(startHour);
+        }
+
+        if(startHour < 10){
+            var hourEnded = '0' + Integer.toString(endHour);
+        }
+
         const date = new Date();
         const title = interaction.options.getString('title');
-        const dateStr = new Date(date.getFullYear(), (interaction.options.getInteger('month') - 1), interaction.options.getInteger('day'),
-                                    hour, interaction.options.getInteger('minute'));
+        //const startDateStr = new Date(date.getFullYear() + '-' + (interaction.options.getInteger('month') - 1) + '-' + interaction.options.getInteger('day') + 'T' + hourStarted + ":00:00");
 
-        let replyStr = `\`\`\`yaml\nDate/Time: ${dateStr.toString()} <t:${dateStr.getTime()}:F>\nTitle: ${title}
+        /* let replyStr = `\`\`\`yaml\nDate/Time: ${dateStr.toString()} <t:${dateStr.getTime()}:F>\nTitle: ${title}
         \nEvent/League and Description: ${eventleague}\nOpponent: ${opponent}\nBracket: ${bracket}\nStream:`;
+        */
 
         if (stream) {
             replyStr += ` ${stream}\n`;
