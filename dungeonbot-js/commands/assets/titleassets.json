@@ -1,0 +1,77 @@
+{
+    "apex" : {
+        "fullName" : "Apex Legends",
+        "calendar" : "a17060424f8157e8d20f0a3143927fcb992b2967f9f415a6c0d773e6d61af11c@group.calendar.google.com",
+        "colorHex" : "#B93038",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/511224-144x192.jpg"
+    },
+
+    "cod" : {
+        "fullName" : "Call of Duty",
+        "calendar" : "ib2d7pcl85ohs10s1vhhi6faqs@group.calendar.google.com",
+        "colorHex" : "#355E3B",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/1337444628-144x192.jpg"
+    },
+
+    "cs" : {
+        "fullName" : "Counterstrike",
+        "calendar" : "i9c07qf08up04fsrr3v5m1vjg8@group.calendar.google.com",
+        "colorHex" : "#DE9B35",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/32399-144x192.jpg"
+    },
+
+    "fgc" : {
+        "fullName" : "Fighting Games",
+        "colorHex" : "",
+        "picURL" : ""
+    },
+
+    "lol" : {
+        "fullName" : "League of Legends",
+        "calendar" : "bkvodjl74fnmte4rbc9hll5kgk@group.calendar.google.com",
+        "colorHex" : "#C89B3C",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/21779-144x192.jpg"
+    },
+
+    "ow" : {
+        "fullName" : "Overwatch",
+        "calendar" : "laodgte8m082939h20jpfi6pvg@group.calendar.google.com",
+        "colorHex" : "#FE8222",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/515025-144x192.jpg"
+    },
+
+    "r6" : {
+        "fullName" : "Tom Clancy's Rainbow Six: Siege",
+        "calendar" : "vtqs1otof0238ggs901g38tih4@group.calendar.google.com",
+        "colorHex" : "#8C8581",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/460630_IGDB-144x192.jpg"
+    },
+
+    "rl" : {
+        "fullName" : "Rocket League",
+        "calendar" : "hlatsk1rp07nneb9gd1mkf1is0@group.calendar.google.com",
+        "colorHex" : "#032760",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/30921-144x192.jpg"
+    },
+
+    "spl" : {
+        "fullName" : "Splatoon",
+        "calendar" : "f16315fa3630ad9860259da31a9cc170332ea25c7ad28f246a0ab4015b393600@group.calendar.google.com",
+        "colorHex" : "#D1F20A",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/1158884259_IGDB-144x192.jpg"
+    },
+
+    "ssb" : {
+        "fullName" : "Super Smash Bros.",
+        "calendar" : "525fe403fec3cee2c22ec825274a4cbc2bea4f10503449e6433657494d411c76@group.calendar.google.com",
+        "colorHex" : "#F88379",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/504461_IGDB-144x192.jpg"
+    },
+
+    "val" : {
+        "fullName" : "VALORANT",
+        "calendar" : "toil6viki8v3gmspfobn140dqs@group.calendar.google.com",
+        "colorHex" : "#FD4556",
+        "picURL" : "https://static-cdn.jtvnw.net/ttv-boxart/516575-144x192.jpg"
+    }
+}

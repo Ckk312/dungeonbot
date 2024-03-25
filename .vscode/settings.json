@@ -1,4 +1,5 @@
 {
     "java.dependency.syncWithFolderExplorer": false,
-    "java.project.explorer.showNonJavaResources": false
+    "java.project.explorer.showNonJavaResources": false,
+    "java.compile.nullAnalysis.mode": "automatic"
 }
