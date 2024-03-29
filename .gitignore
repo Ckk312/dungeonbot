@@ -91,6 +91,6 @@ lerna-debug.log
 Thumbs.db
 
 # files to hide
-token.json
 config.json
+googlecalendar/token.json
 googlecalendar/credentials.json

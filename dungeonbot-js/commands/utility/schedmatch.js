@@ -10,7 +10,7 @@ const TITLE_ASSETS_PATH = path.join(process.cwd(), './commands/assets/titleasset
 
 /**
  * Load json file from path and get object
- * 
+ *
  * @param { string } title name of title
  * @returns { Object }
  */
@@ -56,11 +56,11 @@ const data = new SlashCommandBuilder()
             .setDescription('Select which team is playing this match.')
             .setRequired(true)
             .addChoices(
-                { name: 'UCF Knights', value: 'UCF Knights', },
-                { name: 'UCF Knights Academy', value: 'UCF Knights Academy', },
-                { name: 'UCF Knights Gold', value: 'UCF Knights Gold', },
-                { name: 'UCF Knights Black', value: 'UCF Knights Black', },
-                { name: 'UCF Knights White', value: 'UCF Knights White', },
+                { name: 'UCF Knights', value: 'UCF Knights' },
+                { name: 'UCF Knights Academy', value: 'UCF Knights Academy' },
+                { name: 'UCF Knights Gold', value: 'UCF Knights Gold' },
+                { name: 'UCF Knights Black', value: 'UCF Knights Black' },
+                { name: 'UCF Knights White', value: 'UCF Knights White' },
             ))
     .addIntegerOption(option =>
         option
@@ -136,11 +136,11 @@ const data = new SlashCommandBuilder()
 async function execute(interaction) {
     // set the hour based on am or pm
     let hour = interaction.options.getInteger('hour');
-    let ampm = interaction.options.getString('am-pm');
+    const ampm = interaction.options.getString('am-pm');
     if (ampm === 'pm') {
-        hour += hour == 12 ? 0:12;
+        hour += hour == 12 ? 0 : 12;
     } else {
-        hour -= hour == 12 ? 12:0;
+        hour -= hour == 12 ? 12 : 0;
     }
 
     // take the current date to find the year and construct a new date with given information
@@ -160,7 +160,7 @@ async function execute(interaction) {
         stream: interaction.options.getString('stream-link'),
         socials: interaction.options.getString('opponent-socials'),
         hashtags: interaction.options.getString('hashtags'),
-    }
+    };
 
     // string to reply with and it's editions
     let replyStr = `\`\`\`yaml\nDate/Time: ${date.toString()} <t:${date.getTime() / 1000}:F>\nTitle: ${matchInfo.title}
@@ -224,10 +224,10 @@ async function execute(interaction) {
             .setMatchInfo(matchInfo)
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
-        let info = {
+        const info = {
             calendarId: '309c74357dd09db96919f94f3f07dae0ae1a331bbf00fd32a1cb7b3e81acb9e8@group.calendar.google.com',
             eventResource: eb.toJSON(),
-        }
+        };
         const eventExist = await authorize().then((a) => {
             info.auth = a;
             return info;
@@ -236,7 +236,7 @@ async function execute(interaction) {
         // post to specific games' calendar
         info.calendarId = assets.calendar;
         eb = new EventBuilder()
-            .setMatchInfo(matchInfo)
+            .setEventInfo(matchInfo)
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
         info.eventResource = eb.toJSON();
@@ -258,33 +258,33 @@ async function execute(interaction) {
                     { name: '\u200B', value: '\u200B' },
                     { name: 'Match Up', value: '**' + matchInfo.team + '**\n*vs*\n**' + matchInfo.opponent + '**', inline: true },
                     { name: 'Event/League', value: '*' + matchInfo.eventLeague + '*', inline: true },
-                    { name: 'Bracket' , value: matchInfo.bracket, inline: true },
+                    { name: 'Bracket', value: matchInfo.bracket, inline: true },
                     { name: '\u200B', value: '\u200B' },
                 )
-                .setFooter({ text: 'Created by ' + interaction.user.username, iconURL: interaction.user.displayAvatarURL(), })
+                .setFooter({ text: 'Created by ' + interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                 .setTimestamp();
             if (matchInfo.stream) {
                 matchEmbed.addFields(
-                    { name: 'Stream Information', value: matchInfo.stream, inline: true, }
+                    { name: 'Stream Information', value: matchInfo.stream, inline: true },
                 );
             }
             if (matchInfo.socials) {
                 matchEmbed.addFields(
-                    { name: 'Opponent Socials', value: '*' + matchInfo.socials + '*', inline: true, }
+                    { name: 'Opponent Socials', value: '*' + matchInfo.socials + '*', inline: true },
                 );
             }
             if (matchInfo.hashtags) {
                 matchEmbed.addFields(
-                    { name: 'Relevant Hashtags', value: '**' + matchInfo.hashtags + '**', inline: true, }
+                    { name: 'Relevant Hashtags', value: '**' + matchInfo.hashtags + '**', inline: true },
                 );
             }
-            await interaction.channel.send({ embeds: [matchEmbed], });
+            await interaction.channel.send({ embeds: [matchEmbed] });
         } else {
             interaction.editReply({
                 content: 'Creation on Google Calendar failed.',
                 components: [],
                 ephemeral: true,
-            })
+            });
         }
     }
 

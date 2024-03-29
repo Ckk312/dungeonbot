@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const fs = require('node:fs');
 const path = require('node:path');
 const process = require('process');
-const { activate } = require('./googlecalendar/googleapi.js');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 // enable config for dotenv functionality
@@ -27,7 +26,7 @@ for (const folder of commandFolders) {
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
-    
+
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
         }

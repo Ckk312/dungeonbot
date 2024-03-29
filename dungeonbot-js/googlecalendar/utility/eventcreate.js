@@ -3,7 +3,7 @@ const { google } = require('googleapis');
 /**
  * Create a Google Calendar Event
  *
- * @param { Object } info Object that must have auth, calendarId, and eventResource 
+ * @param { Object } info Object that must have auth, calendarId, and eventResource
  * (object created with gCal information)
  */
 async function createEvent(info) {
