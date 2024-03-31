@@ -10,7 +10,7 @@ async function listEvents(calendarInfo) {
     const timeStart = new Date(calendarInfo.date);
     const timeEnd = new Date(timeStart.getFullYear(), timeStart.getMonth(), timeStart.getDate(), 23, 59, 59);
     const res = await calendar.events.list({
-      calendarId : '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+      calendarId : calendarInfo.calendarId,
       timeMin: timeStart,
       timeMax: timeEnd,
       maxResults: 10,
