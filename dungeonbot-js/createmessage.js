@@ -15,6 +15,10 @@ function createMessage(eventList) {
 
     // add fields based on array size
     try {
+        if (eventList.length == 0) {
+            throw new Error('Empty List');
+        }
+
         for (const event of eventList) {
             const string = '**Beginning at:** <t:' + (new Date(event.start.dateTime).getTime() / 1000) + ':t>' +
                 '\n**Ending at:** <t:' + (new Date(event.end.dateTime).getTime() / 1000) + ':t>\n*' + event.description + '*';
@@ -26,8 +30,8 @@ function createMessage(eventList) {
             eb.addFields(message);
         }
     } catch (e) {
-        console.log(e);
         eb.addFields({ name: '**__NO EVENTS ARE SCHEDULED FOR TODAY__**', value: ' ' });
+        console.log(e);
     }
 
     eb.addFields({ name: '**REMEMBER**', value: 'Teams with a reservation have the right to ask you to leave. ' +
