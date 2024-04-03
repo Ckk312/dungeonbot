@@ -50,63 +50,31 @@ const data = new SlashCommandBuilder()
 //SU open? line 53
 //SU close? return 0;
 
-//Loop through event list and check if starting time is between event times
-//Example
+timeInvalidDueToHOO(/* Date type object representing event being made */){
+    if(/* Start time of event is before 07:00Hrs or After 9:00PM*/)
+        return false;
+    else
+        return true
+}
 
-//Event 0
-//New event starts same as Event 0? Yes
-//Return False
+isTimeDuringEvent(/* Date type object representing event being made*/){
+    
+    let isTrue = true;
+    
+    for(/*Each item in the list of events */){
+        //Store their start and end time
+        if(/*Start is between those times*/)
+            return false;
+        else if(/*End is between those times*/)
+            return false;
 
-//New event before Event 0
-//New event start 9am Event 0 start 12am
-//Is the ending of the new event earlier or equal to the start of the new event being made? Yes?
-//Event return true
-//Else return false
+        else
+            continue;
 
-//New event during Event 0
-//New event starts at 9am, check if the event on cal starts before it? (8am) Yes 
+    }
 
-
-//First statement false (cal event starts 10am)
-//Is ending of new event later start of cal event (ending 12am vs starting 10am) Yes?
-//Event invalid return false
-
-//
-
-
-
-
-
-
-
-
-
-
-
-//Has 1 event
-
-//Start conditions
-//Before start of event 0 or After end of event 0
-
-//End conditions
-//If before start of event 0
-//End also before start of event 0
-//true
-//else false
-
-//If after start of event 0
-//true
-
-
-//Has 2+ events
-//Conditions
-//New event start before event 0 start
-//New event end before event 0 start
-
-//New event start after event 0 end
-//New event start before event 1 start
-
-
+    return isTrue;
+}
 
 
 
