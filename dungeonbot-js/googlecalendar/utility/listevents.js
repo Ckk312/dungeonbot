@@ -23,4 +23,4 @@ async function listEvents(calendarInfo) {
 
 module.exports = {
     listEvents,
-}
+};

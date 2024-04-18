@@ -136,5 +136,5 @@ async function sendMessage(client, schedule) {
 // list of exports
 module.exports = {
     findCurrentDifference,
-    sendMessage
-}
+    sendMessage,
+};

@@ -1,15 +1,14 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { authorize } = require('./googlecalendar/googleapi.js')
+const { authorize } = require('./googlecalendar/googleapi.js');
+const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
+const { createEvent } = require('../../googlecalendar/utility/eventcreate.js')
 const lister = require ('./googlecalendar/utility/listevents.js');
-
-
-
 
 const data = new SlashCommandBuilder()
 
-    .setName('reserve') // /reserve
+    .setName('reserve')
     .setDescription('Reserve the dungeon for a specific date')
-    
+
     .addIntegerOption(option =>
         option
             .setName('month')
@@ -46,36 +45,6 @@ const data = new SlashCommandBuilder()
             .setDescription('Title of Event')
             .setRequired(true));
 
-//Function is valid start
-
-//SU open? line 53
-//SU close? return 0;
-
-timeInvalidDueToHOO(/* Date type object representing event being made */){
-    if(/* Start time of event is before 07:00Hrs or After 9:00PM*/)
-        return false;
-    else
-        return true
-}
-
-isTimeDuringEvent(/* Date type object representing event being made*/){
-    
-    let isTrue = true;
-    
-    for(/*Each item in the list of events */){
-        //Store their start and end time
-        if(/*Start is between those times*/)
-            return false;
-        else if(/*End is between those times*/)
-            return false;
-
-        else
-            continue;
-
-    }
-    return isTrue;
-}
-
 /**
  * Compare a google calendar event and a date to ensure they don't collide
  * @param { Object } gCalEvent
@@ -87,8 +56,8 @@ function compare(gCalEvent, Date) {
         return false;
     }
 
-    gCalStart = new Date(gCalEvent.start.dateTime);
-    gCalEnd = new Date(gCalEvent.end.dateTime);
+    const gCalStart = new Date(gCalEvent.start.dateTime);
+    const gCalEnd = new Date(gCalEvent.end.dateTime);
 
     if (gCalStart.getHour() < Date.getHour()) {
         if (gCalEnd.getHour() < Date.getHour()) {
@@ -103,11 +72,11 @@ function compare(gCalEvent, Date) {
             return true;
         }
 
-        /*else if (gCalStart.getHour() === (Date.getHour() + 3)) {
+        /* else if (gCalStart.getHour() === (Date.getHour() + 3)) {
             if (gCalStart.getMinute() >= Date.getMinute()) {
 
             }
-        }*/
+        } */
 
         return false;
     }
@@ -139,7 +108,7 @@ module.exports = {
     data,
     async execute(interaction) {
         interaction.deferReply();
-        options = interaction.options;
+        const options = interaction.options;
         const timeConstants = {
             normalDay: {
                 DAY_START: 7,
@@ -156,7 +125,7 @@ module.exports = {
                 DAY_END_HOUR: 9,
                 DAY_END_START: 59,
             },
-        }
+        };
 
         // determine hour based on am-pm
         let hour = options.getInteger('startHour');
@@ -170,19 +139,19 @@ module.exports = {
         }
 
         // create dates and event info to get events
-        curDate = new Date();
-        resDate = new Date(curDate.getFullYear(), options.getInteger('month') - 1, options.getInteger('day'), hour);
+        const curDate = new Date();
+        const resDate = new Date(curDate.getFullYear(), options.getInteger('month') - 1, options.getInteger('day'), hour);
 
-        eventInfo = {
+        const eventInfo = {
             auth: authorize(),
             date: new Date(resDate.getFullYear(), resDate.getMonth(), resDate.getDate()),
             id: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-        }
+        };
 
-        events = lister.listEvents(eventInfo);
+        const events = lister.listEvents(eventInfo);
 
         // check that all events in the list don't conflict with the desired event
-        for (let event of events) {
+        for (const event of events) {
             if (resDate.getDay() === 5) {
                 if (resDate.getHour() < timeConstants.saturday.DAY_START) {
                     await invalidResponse(interaction, 0);
@@ -194,8 +163,8 @@ module.exports = {
                     return;
                 }
             }
-            
-            if (resDate.getDay() === 6) {
+
+            else if (resDate.getDay() === 6) {
                 if (resDate.getHour() < timeConstants.sunday.DAY_START) {
                     await invalidResponse(interaction, 0);
                     return;
@@ -206,8 +175,8 @@ module.exports = {
                     return;
                 }
             }
-            
-            if (resDate.getDay() < 6) {
+
+            else if (resDate.getDay() < 5) {
                 if (resDate.getHour() < timeConstants.normalDay.DAY_START) {
                     await invalidResponse(interaction, 0);
                     return;
@@ -222,12 +191,24 @@ module.exports = {
 
         // create the event on google calendar
         try {
-
-        } catch {
-
+            const info = {
+                auth: eventInfo.auth,
+                calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+                resource: new EventBuilder()
+                    .setSummary(options.getString('title'))
+                    .setDescription('Event Created by ' + interaction.user.username)
+                    .setStartTime(resDate)
+                    .setEndTime(new Date(resDate.getFullYear(), resDate.getMonth(), resDate.getDate(), resDate.getHour() + 3, resDate.getMinute())),
+            };
+            createEvent(info);
+        } catch (e) {
+            interaction.editReply('Adding event to Google Calendar failed...');
+            console.error(e);
+            return;
         }
 
         // respond
         interaction.editReply('yay');
+        return;
     },
 };
