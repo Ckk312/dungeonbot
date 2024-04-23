@@ -24,7 +24,7 @@ module.exports = {
 
         console.log(eventList);
 
-        setTimeout(reminderSched.sendMessage, msDiff, client, createMessage(eventList));
+        setTimeout(await reminderSched.sendMessage, msDiff, client, createMessage(eventList));
 
         // print next function call
         const sec = (msDiff / 1000) % 60;

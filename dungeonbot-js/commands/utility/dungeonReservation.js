@@ -51,7 +51,7 @@ const data = new SlashCommandBuilder()
  * @param { Date } Date
  * @return { boolean }
  */
-function compare(gCalEvent, Date) {
+function compare(gCalEvent, date) {
     if (!gCalEvent.start || !gCalEvent.end) {
         return false;
     }
@@ -59,16 +59,16 @@ function compare(gCalEvent, Date) {
     const gCalStart = new Date(gCalEvent.start.dateTime);
     const gCalEnd = new Date(gCalEvent.end.dateTime);
 
-    if (gCalStart.getHour() < Date.getHour()) {
-        if (gCalEnd.getHour() < Date.getHour()) {
+    if (gCalStart.getHours() < date.getHours()) {
+        if (gCalEnd.getHours() < date.getHours()) {
             return true;
         }
 
         return false;
     }
 
-    else if (gCalStart.getHour() > Date.getHour()) {
-        if (gCalStart.getHour() > (Date.getHour() + 3)) {
+    else if (gCalStart.getHours() > Date.getHours()) {
+        if (gCalStart.getHours() > (Date.getHours() + 3)) {
             return true;
         }
 
@@ -86,12 +86,13 @@ function compare(gCalEvent, Date) {
  * @param { number } code
  */
 async function invalidResponse(interaction, code) {
+    const errCode = '**This event could not be created:**';
     switch (code) {
         case 0:
-            await interaction.editReply('This event could not be created.\nThe event exists outside of Student Union hours');
+            await interaction.editReply(errCode + 'This event exists outside of Student Union hours');
             break;
         case 1:
-            await interaction.editReply('This event could not be created.\nThere is a conflict with another reservation. Contact the General Manager for any reservation conflicts.');
+            await interaction.editReply(errCode + 'There is a conflict with another reservation. Contact the *General Manager* for any reservation conflicts.');
             break;
         default:
             break;
@@ -122,7 +123,7 @@ module.exports = {
         };
 
         // determine hour based on am-pm
-        let hour = options.getInteger('startHour');
+        let hour = options.getInteger('starthour');
 
         if (options.getString('am-pm1') === 'pm' && hour < 11) {
             hour += 12;
@@ -142,51 +143,43 @@ module.exports = {
             calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
         };
 
-        const events = lister.listEvents(eventInfo);
+        const events = await lister.listEvents(eventInfo);
+
+        // check if the event is within SU hours
+        if (resDate.getDay() === 5) {
+            if (resDate.getHours() < timeConstants.saturday.DAY_START) {
+                await invalidResponse(interaction, 0);
+                return;
+            }
+        }
+
+        else if (resDate.getDay() === 6) {
+            if (resDate.getHours() < timeConstants.sunday.DAY_START) {
+                await invalidResponse(interaction, 0);
+                return;
+            }
+        }
+
+        else if (resDate.getDay() < 5) {
+            if (resDate.getHours() < timeConstants.normalDay.DAY_START) {
+                await invalidResponse(interaction, 0);
+                return;
+            }
+        }
 
         // check that all events in the list don't conflict with the desired event
         try {
             for (const event of events) {
-                if (resDate.getDay() === 5) {
-                    if (resDate.getHour() < timeConstants.saturday.DAY_START) {
-                        await invalidResponse(interaction, 0);
-                        return;
-                    }
-
-                    if (!compare(event, resDate)) {
-                        await invalidResponse(interaction, 1);
-                        return;
-                    }
-                }
-
-                else if (resDate.getDay() === 6) {
-                    if (resDate.getHour() < timeConstants.sunday.DAY_START) {
-                        await invalidResponse(interaction, 0);
-                        return;
-                    }
-
-                    if (!compare(event, resDate)) {
-                        await invalidResponse(interaction, 1);
-                        return;
-                    }
-                }
-
-                else if (resDate.getDay() < 5) {
-                    if (resDate.getHour() < timeConstants.normalDay.DAY_START) {
-                        await invalidResponse(interaction, 0);
-                        return;
-                    }
-
-                    if (!compare(event, resDate)) {
-                        await invalidResponse(interaction, 1);
-                        return;
-                    }
+                if (!compare(event, resDate)) {
+                    await invalidResponse(interaction, 1);
+                    return;
                 }
             }
         } catch (e) {
             // probably just an empty list
             console.error(e);
         }
+
         // create the event on google calendar
         try {
             const info = {
@@ -207,7 +200,7 @@ module.exports = {
         }
 
         // respond
-        await interaction.editReply({ content: 'Reservation has been saved on Google Calendar. Check the calendar to find your reservation', ephemeral: true });
+        await interaction.editReply({ content: 'Reservation has been saved on Google Calendar. Check the [calendar](https://calendar.google.com/calendar/embed?src=96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e%40group.calendar.google.com&ctz=America%2FNew_York) to find your reservation', ephemeral: true });
         return;
     },
 };
