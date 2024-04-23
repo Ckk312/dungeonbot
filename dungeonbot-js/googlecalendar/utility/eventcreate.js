@@ -16,8 +16,7 @@ async function createEvent(info) {
         resource: info.eventResource,
     }, function(err, event) {
         if (err) {
-            console.log('There was an error contacting the Calendar service: ' + err);
-            return;
+            throw new Error('There was an error contacting the Calendar service: ' + err);
         }
         console.log('Event created: %s', event.htmlLink);
     });

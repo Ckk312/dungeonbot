@@ -105,6 +105,7 @@ class EventBuilder {
     setEventInfo(eventInfo) {
         this.setSummary(eventInfo.summary);
         this.setDescription(eventInfo.description);
+        return this;
     }
 
     /**

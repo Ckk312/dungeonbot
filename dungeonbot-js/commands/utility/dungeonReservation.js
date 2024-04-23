@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { authorize } = require('./googlecalendar/googleapi.js');
+const { authorize } = require('../../googlecalendar/googleapi.js');
 const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
 const { createEvent } = require('../../googlecalendar/utility/eventcreate.js');
-const lister = require ('./googlecalendar/utility/listevents.js');
+const lister = require ('../../googlecalendar/utility/listevents.js');
 
 const data = new SlashCommandBuilder()
 
@@ -25,7 +25,7 @@ const data = new SlashCommandBuilder()
             .setMaxValue(31))
     .addIntegerOption(option =>
         option
-            .setName('startHour')
+            .setName('starthour')
             .setDescription('start hour based on 12 hour system')
             .setRequired(true)
             .setMinValue(1)
@@ -101,7 +101,7 @@ async function invalidResponse(interaction, code) {
 module.exports = {
     data,
     async execute(interaction) {
-        interaction.deferReply();
+        await interaction.deferReply();
         const options = interaction.options;
         const timeConstants = {
             normalDay: {
@@ -137,72 +137,77 @@ module.exports = {
         const resDate = new Date(curDate.getFullYear(), options.getInteger('month') - 1, options.getInteger('day'), hour);
 
         const eventInfo = {
-            auth: authorize(),
+            auth: await authorize(),
             date: new Date(resDate.getFullYear(), resDate.getMonth(), resDate.getDate()),
-            id: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
         };
 
         const events = lister.listEvents(eventInfo);
 
         // check that all events in the list don't conflict with the desired event
-        for (const event of events) {
-            if (resDate.getDay() === 5) {
-                if (resDate.getHour() < timeConstants.saturday.DAY_START) {
-                    await invalidResponse(interaction, 0);
-                    return;
+        try {
+            for (const event of events) {
+                if (resDate.getDay() === 5) {
+                    if (resDate.getHour() < timeConstants.saturday.DAY_START) {
+                        await invalidResponse(interaction, 0);
+                        return;
+                    }
+
+                    if (!compare(event, resDate)) {
+                        await invalidResponse(interaction, 1);
+                        return;
+                    }
                 }
 
-                if (!compare(event, resDate)) {
-                    await invalidResponse(interaction, 1);
-                    return;
+                else if (resDate.getDay() === 6) {
+                    if (resDate.getHour() < timeConstants.sunday.DAY_START) {
+                        await invalidResponse(interaction, 0);
+                        return;
+                    }
+
+                    if (!compare(event, resDate)) {
+                        await invalidResponse(interaction, 1);
+                        return;
+                    }
+                }
+
+                else if (resDate.getDay() < 5) {
+                    if (resDate.getHour() < timeConstants.normalDay.DAY_START) {
+                        await invalidResponse(interaction, 0);
+                        return;
+                    }
+
+                    if (!compare(event, resDate)) {
+                        await invalidResponse(interaction, 1);
+                        return;
+                    }
                 }
             }
-
-            else if (resDate.getDay() === 6) {
-                if (resDate.getHour() < timeConstants.sunday.DAY_START) {
-                    await invalidResponse(interaction, 0);
-                    return;
-                }
-
-                if (!compare(event, resDate)) {
-                    await invalidResponse(interaction, 1);
-                    return;
-                }
-            }
-
-            else if (resDate.getDay() < 5) {
-                if (resDate.getHour() < timeConstants.normalDay.DAY_START) {
-                    await invalidResponse(interaction, 0);
-                    return;
-                }
-
-                if (!compare(event, resDate)) {
-                    await invalidResponse(interaction, 1);
-                    return;
-                }
-            }
+        } catch (e) {
+            // probably just an empty list
+            console.error(e);
         }
-
         // create the event on google calendar
         try {
             const info = {
                 auth: eventInfo.auth,
                 calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-                resource: new EventBuilder()
+                eventResource: new EventBuilder()
                     .setSummary(options.getString('title'))
                     .setDescription('Event Created by ' + interaction.user.username)
-                    .setStartTime(resDate)
-                    .setEndTime(new Date(resDate.getFullYear(), resDate.getMonth(), resDate.getDate(), resDate.getHour() + 3, resDate.getMinute())),
+                    .setStartTime(resDate.toISOString())
+                    .setEndTime((new Date(resDate.getFullYear(), resDate.getMonth(), resDate.getDate(), resDate.getHours() + 3, resDate.getMinutes())).toISOString())
+                    .toJSON(),
             };
-            createEvent(info);
+            await createEvent(info);
         } catch (e) {
-            interaction.editReply('Adding event to Google Calendar failed...');
+            await interaction.editReply('Adding event to Google Calendar failed...');
             console.error(e);
             return;
         }
 
         // respond
-        interaction.editReply('yay');
+        await interaction.editReply('Reservation has been saved on Google Calendar. Check the calendar to find your reservation');
         return;
     },
 };
