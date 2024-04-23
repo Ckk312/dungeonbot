@@ -101,7 +101,7 @@ async function invalidResponse(interaction, code) {
 module.exports = {
     data,
     async execute(interaction) {
-        await interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
         const options = interaction.options;
         const timeConstants = {
             normalDay: {
@@ -207,7 +207,7 @@ module.exports = {
         }
 
         // respond
-        await interaction.editReply('Reservation has been saved on Google Calendar. Check the calendar to find your reservation');
+        await interaction.editReply({ content: 'Reservation has been saved on Google Calendar. Check the calendar to find your reservation', ephemeral: true });
         return;
     },
 };
