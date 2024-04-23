@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { sendMessage } = require('../../susched.js');
 const { createMessage } = require('../../createmessage.js');
 const { authorize } = require('../../googlecalendar/googleapi.js');
 const { listEvents } = require('../../googlecalendar/utility/listevents.js');

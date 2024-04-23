@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { authorize } = require('./googlecalendar/googleapi.js');
 const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
-const { createEvent } = require('../../googlecalendar/utility/eventcreate.js')
+const { createEvent } = require('../../googlecalendar/utility/eventcreate.js');
 const lister = require ('./googlecalendar/utility/listevents.js');
 
 const data = new SlashCommandBuilder()
@@ -71,12 +71,6 @@ function compare(gCalEvent, Date) {
         if (gCalStart.getHour() > (Date.getHour() + 3)) {
             return true;
         }
-
-        /* else if (gCalStart.getHour() === (Date.getHour() + 3)) {
-            if (gCalStart.getMinute() >= Date.getMinute()) {
-
-            }
-        } */
 
         return false;
     }
