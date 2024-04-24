@@ -15,6 +15,9 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // Create a list of all commands in client
 client.commands = new Collection();
 
+// Create a list of all command cooldowns in client
+client.cooldowns = new Collection();
+
 // add commands from directories of commands
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);

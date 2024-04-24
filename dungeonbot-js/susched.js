@@ -130,7 +130,7 @@ async function sendMessage(client, schedule) {
     const sec = (difference / 1000) % 60;
     const min = (difference / 60000) % 60;
     const hour = difference / (3600 * 6000);
-    console.log(`Next Schedule Update in ${hour.toPrecision(3)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec ...`);
+    console.log(`Next Schedule Update in ${Math.floor(hour)} hrs ${Math.floor(min)} min and ${Math.round(sec)} sec ...`);
 }
 
 // list of exports

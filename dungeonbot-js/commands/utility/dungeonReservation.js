@@ -100,6 +100,7 @@ async function invalidResponse(interaction, code) {
 }
 
 module.exports = {
+    cooldown: 5,
     data,
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
