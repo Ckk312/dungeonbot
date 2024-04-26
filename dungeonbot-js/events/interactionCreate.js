@@ -42,7 +42,7 @@ module.exports = {
             // check if cooldown has expired
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1_000);
-                return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
+                return await interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
             }
         }
 
@@ -58,18 +58,18 @@ module.exports = {
                     const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
                     info = JSON.parse(file);
                 } catch(e) {
-                    interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
+                    await interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
                     console.error(e);
                     return;
                 }
 
                 if (!interaction.member.roles.cache.has('899044671119061072')) {
-                    interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
+                    await interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
                     return;
                 }
 
                 if (info[interaction.commandName] != interaction.channel.id) {
-                    interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
+                    await interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
                     return;
                 }
                 break;
