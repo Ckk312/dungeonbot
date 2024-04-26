@@ -167,11 +167,17 @@ async function execute(interaction) {
         \nEvent/League and Description: ${matchInfo.eventLeague}\nOpponent: ${matchInfo.opponent}\nBracket: ${matchInfo.bracket}\nSocials:`;
 
     if (matchInfo.socials) {
-        replyStr += ` ${matchInfo.socials}\nHashtags:`;
+        replyStr += ` ${matchInfo.socials}`;
     }
+
+    replyStr += 'Hashtags: ';
+
     if (matchInfo.hashtags) {
-        replyStr += ` ${matchInfo.hashtags}\nStream:`;
+        replyStr += ` ${matchInfo.hashtags}`;
     }
+
+    replyStr += 'Stream: ';
+
     if (matchInfo.stream) {
         replyStr += ` ${matchInfo.stream}\n`;
     }
