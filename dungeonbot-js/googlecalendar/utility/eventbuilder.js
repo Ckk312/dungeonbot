@@ -105,10 +105,13 @@ class EventBuilder {
     setEventInfo(eventInfo) {
         this.setSummary(eventInfo.summary);
         this.setDescription(eventInfo.description);
+        return this;
     }
 
     /**
     * Builds an event object and returns it
+    * KIER WAS STUPID AND CALLED IT TO JSON. IT DOESN'T RETURN A JSON STRING. IT RETURNS AN OBJECT.
+    * HE IS TOO LAZY TO GO BACK INTO THE CODE AND RENAME ALL THE toJSON METHODS.
     * 
     * @return { gCalEvent }
     */

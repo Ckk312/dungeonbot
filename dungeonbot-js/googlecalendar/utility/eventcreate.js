@@ -3,7 +3,7 @@ const { google } = require('googleapis');
 /**
  * Create a Google Calendar Event
  *
- * @param { Object } info Object that must have auth, calendarId, and eventResource 
+ * @param { Object } info Object that must have auth, calendarId, and eventResource
  * (object created with gCal information)
  */
 async function createEvent(info) {
@@ -16,8 +16,7 @@ async function createEvent(info) {
         resource: info.eventResource,
     }, function(err, event) {
         if (err) {
-            console.log('There was an error contacting the Calendar service: ' + err);
-            return;
+            throw new Error('There was an error contacting the Calendar service: ' + err);
         }
         console.log('Event created: %s', event.htmlLink);
     });
