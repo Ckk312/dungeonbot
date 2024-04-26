@@ -18,7 +18,8 @@ const data = new SlashCommandBuilder()
     .addChannelOption(option =>
         option.setName('channel')
             .setRequired(true)
-            .setDescription('Pick a channel'));
+            .setDescription('Pick a channel'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 async function execute(interaction) {
     await interaction.deferReply();

@@ -25,35 +25,6 @@ module.exports = {
             console.error(`No command matching ${interaction.commandName} was found`);
         }
 
-        // do actions based on command
-        switch (interaction.commandName) {
-            case 'schedmatch':
-                let info;
-                try {
-                    const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
-                    info = JSON.parse(file);
-                } catch(e) {
-                    interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
-                    console.error(e);
-                    return;
-                }
-
-                
-                if (!interaction.member.roles.cache.has('899044671119061072')) {
-                    interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
-                    return;
-                }
-
-                if (info[interaction.commandName] != interaction.channel.id) {
-                    interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
-                    return;
-                }
-                break;
-        
-            default:
-                break;
-        }
-
         if (!cooldowns.has(command.data.name)) {
             cooldowns.set(command.data.name, new Collection());
         }
@@ -78,6 +49,33 @@ module.exports = {
         // create a timestamp of when the user last used the command and delete it when the cooldown is expired
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+
+        // do actions based on command
+        switch (interaction.commandName) {
+            case 'schedmatch':
+                let info;
+                try {
+                    const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
+                    info = JSON.parse(file);
+                } catch(e) {
+                    interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
+                    console.error(e);
+                    return;
+                }
+
+                if (!interaction.member.roles.cache.has('899044671119061072')) {
+                    interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
+                    return;
+                }
+
+                if (info[interaction.commandName] != interaction.channel.id) {
+                    interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
+                    return;
+                }
+                break;
+            default:
+                break;
+        }
 
         // attempt to execute interaction
         try {
