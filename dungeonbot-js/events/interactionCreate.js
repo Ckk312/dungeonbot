@@ -50,21 +50,21 @@ module.exports = {
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
+        let info;
         // do actions based on command
         switch (interaction.commandName) {
             case 'schedmatch':
-                let info;
                 try {
                     const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
                     info = JSON.parse(file);
-                } catch(e) {
+                } catch (e) {
                     interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
                     console.error(e);
                     return;
                 }
 
                 if (!interaction.member.roles.cache.has('899044671119061072')) {
-                    interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
+                    interaction.reply({ content: 'You do not have the "Title Manager" role to complete this command.', ephemeral: true });
                     return;
                 }
 

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, IntegrationApplication } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');

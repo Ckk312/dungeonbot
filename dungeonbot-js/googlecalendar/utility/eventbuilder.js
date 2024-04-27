@@ -1,12 +1,10 @@
 class EventBuilder {
-    gCalEvent;
-
     constructor(gCalEvent = {}) {
         this.gCalEvent = { ...gCalEvent };
         this.gCalEvent.anyoneCanAddSelf = false;
         this.gCalEvent.reminders = {
             useDefault : true,
-        }
+        };
         this.gCalEvent.general = false;
         return this;
     }
@@ -21,7 +19,7 @@ class EventBuilder {
 
     /**
      * Attaches summary to builder
-     * 
+     *
      * @param { string } summary
      */
     setSummary(summary) {
@@ -31,7 +29,7 @@ class EventBuilder {
 
     /**
      * Attaches a description to builder
-     * 
+     *
      * @param { string } description
      */
     setDescription(description) {
@@ -41,35 +39,35 @@ class EventBuilder {
 
     /**
      * Attaches a start time to builder
-     * 
+     *
      * @param { Date } date
      */
     setStartTime(date) {
-        let dateFormat = (date).slice(0, 19) + '-00:00';
+        const dateFormat = (date).slice(0, 19) + '-00:00';
         this.gCalEvent.start = {
             dateTime : dateFormat,
             timeZone : 'America/New_York',
-        }
+        };
         return this;
     }
 
     /**
      * Attaches an end time to builder
-     * 
+     *
      * @param { string } date
      */
     setEndTime(date) {
-        let dateFormat = (date).slice(0, 19) + '-00:00';
+        const dateFormat = (date).slice(0, 19) + '-00:00';
         this.gCalEvent.end = {
             dateTime : dateFormat,
             timeZone : 'America/New_York',
-        }
+        };
         return this;
     }
 
     /**
      * DOES NOT INCLUDE START AND END DATE. Only includes other match information.
-     * 
+     *
      * @param { Object } match Object that includes match information
      * @returns
      */
@@ -88,7 +86,7 @@ class EventBuilder {
 
         let summary;
         if (this.gCalEvent.general) {
-            summary = `[${match.game.toUpperCase()}] `
+            summary = `[${match.game.toUpperCase()}] `;
         }
 
         summary += `UCF vs ${match.opponent}`;
@@ -99,7 +97,7 @@ class EventBuilder {
 
     /**
      * DOES NOT INCLUDE START AND END DATE. Only includes summary and description
-     * 
+     *
      * @param { Object } eventInfo must have summary and description in object
      */
     setEventInfo(eventInfo) {
@@ -112,7 +110,7 @@ class EventBuilder {
     * Builds an event object and returns it
     * KIER WAS STUPID AND CALLED IT TO JSON. IT DOESN'T RETURN A JSON STRING. IT RETURNS AN OBJECT.
     * HE IS TOO LAZY TO GO BACK INTO THE CODE AND RENAME ALL THE toJSON METHODS.
-    * 
+    *
     * @return { gCalEvent }
     */
     toJSON() {
@@ -121,5 +119,5 @@ class EventBuilder {
 }
 
 module.exports = {
-    EventBuilder
-}
+    EventBuilder,
+};
