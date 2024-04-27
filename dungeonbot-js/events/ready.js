@@ -30,6 +30,6 @@ module.exports = {
         const sec = (msDiff / 1000) % 60;
         const min = (msDiff / 60000) % 60;
         const hour = msDiff / (3600000);
-        console.log(`Next Schedule Update in ${hour.toPrecision(3)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec.`);
+        console.log(`Next Schedule Update in ${Math.floor(hour)} hrs ${Math.floor(min)} min and ${Math.round(sec)} sec ...`);
     },
 };
