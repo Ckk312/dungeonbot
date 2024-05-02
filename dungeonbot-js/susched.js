@@ -93,6 +93,14 @@ function findCurrentDifference() {
     return tmrOpening;
 }
 
+async function msgLoop(client, schedule) {
+    const channel = await client
+        .channels
+        .cache
+        .get('763248812558778378');
+    channel.send(schedule);
+}
+
 /**
  * Sends message and recurses with delay
  *
@@ -100,37 +108,31 @@ function findCurrentDifference() {
  * @param { string } schedule Message string
  */
 async function sendMessage(client, schedule) {
-    const date = new Date();
-    const channel = await client
-        .channels
-        .cache
-        .get('763248812558778378');
-    channel.send(schedule);
+    msgLoop(client, schedule);
 
-    if (date.getDay() == 5 || date.getDay() == 6) {
-        difference = dayPlus2Hours;
+    const value = true;
+    while (value) {
+        const date = new Date();
+        if (date.getDay() == 5 || date.getDay() == 6) {
+            difference = dayPlus2Hours;
+        }
+        else if (date.getDay() == 0) {
+            difference = dayMinus4Hours;
+        }
+        else {
+            difference = day;
+        }
+
+        const info = {
+            auth: await authorize(),
+            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+            date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+        };
+
+        const newMessage = createMessage(listEvents(info));
+
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client, newMessage));
     }
-    else if (date.getDay() == 0) {
-        difference = dayMinus4Hours;
-    }
-    else {
-        difference = day;
-    }
-
-    const info = {
-        auth: await authorize(),
-        calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-        date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
-    };
-
-    const newMessage = createMessage(listEvents(info));
-
-    setTimeout(sendMessage, difference, client, newMessage);
-
-    const sec = (difference / 1000) % 60;
-    const min = (difference / 60000) % 60;
-    const hour = difference / (3600 * 6000);
-    console.log(`Next Schedule Update in ${Math.floor(hour)} hrs ${Math.floor(min)} min and ${Math.round(sec)} sec ...`);
 }
 
 // list of exports
