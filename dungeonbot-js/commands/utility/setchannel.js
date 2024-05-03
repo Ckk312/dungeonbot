@@ -32,10 +32,10 @@ async function execute(interaction) {
     }
     object[interaction.options.getString('command')] = interaction.options.getChannel('channel').id;
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
-    await interaction.editReply('#' + interaction.options.getChannel('channel').name + ' is assigned as the channel for /' + interaction.options.getString('command'));
+    await interaction.editReply(interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'));
 }
 
 module.exports = {
     data,
     execute,
-}
+};
