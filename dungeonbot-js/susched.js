@@ -1,4 +1,4 @@
-const { authorize } = require('./googlecalendar/googleapi.js');
+const { authorize, reauth } = require('./googlecalendar/googleapi.js');
 const { listEvents } = require('./googlecalendar/utility/listevents.js');
 const { createMessage } = require('./createmessage.js');
 
@@ -94,6 +94,10 @@ function findCurrentDifference() {
 }
 
 async function msgLoop(client, schedule) {
+    if (!schedule) {
+        return;
+    }
+
     const channel = await client
         .channels
         .cache
@@ -129,9 +133,21 @@ async function sendMessage(client, schedule) {
             date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
         };
 
-        const newMessage = createMessage(listEvents(info));
+        let newMessage = null;
+        try {
+            newMessage = createMessage(await listEvents(info));
+        } catch (e) {
+            console.error(e);
+            await reauth();
+        }
 
         await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client, newMessage));
+
+        // print next function call
+        const sec = (difference / 1000) % 60;
+        const min = (difference / 60000) % 60;
+        const hour = difference / (3600000);
+        console.log(`Next Schedule Update in ${Math.floor(hour)} hrs ${Math.floor(min)} min and ${Math.round(sec)} sec ...`);
     }
 }
 
