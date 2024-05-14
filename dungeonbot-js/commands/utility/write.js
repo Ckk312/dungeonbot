@@ -17,6 +17,7 @@ const data = new SlashCommandBuilder()
         );
 
 async function execute(interaction) {
+    // try to send in channel and catch otherwise
     try {
         await interaction.options.getChannel('channel').send(interaction.options.getString('message'));
     } catch (e) {
@@ -25,6 +26,7 @@ async function execute(interaction) {
         return;
     }
 
+    // respond no matter what
     await interaction.reply({ content: `Message has been sent in ${interaction.channel.url}`, ephemeral: true });
 }
 

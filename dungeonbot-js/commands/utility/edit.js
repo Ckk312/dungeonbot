@@ -24,8 +24,10 @@ const data = new SlashCommandBuilder()
 
 async function execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+    // get the channel
     const channel = await interaction.client.channels.cache.get(interaction.options.getString('message-channel'));
 
+    // try to edit the message if it exists. Fail otherwise
     try {
         const msg = await channel.messages.fetch(interaction.options.getString('message-id'));
         await msg.edit(interaction.options.getString('message-body'));
