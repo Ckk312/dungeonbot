@@ -95,3 +95,4 @@ config.json
 googlecalendar/token.json
 googlecalendar/credentials.json
 dungeonbot-js/googlecalendar/token.json
+dungeonbot-js/googlecalendar/credentials.json

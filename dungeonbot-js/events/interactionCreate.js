@@ -50,10 +50,10 @@ module.exports = {
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
+        let info;
         // do actions based on command
         switch (interaction.commandName) {
             case 'schedmatch':
-                let info;
                 try {
                     const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
                     info = JSON.parse(file);
@@ -82,7 +82,7 @@ module.exports = {
             await command.execute(interaction);
         } catch (error) {
             console.error(error);
-            if (!interaction.replied) {
+            if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral : true });
             } else {
                 await interaction.editReply('There was an error while executing this command!');

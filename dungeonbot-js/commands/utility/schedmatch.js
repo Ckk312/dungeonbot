@@ -305,7 +305,7 @@ async function execute(interaction) {
 }
 
 module.exports = {
-    cooldown: 5,
+    cooldown: 60,
     data,
     execute,
 };

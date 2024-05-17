@@ -65,6 +65,16 @@ async function authorize() {
   return client;
 }
 
+async function reauth() {
+  const client = await authenticate({
+    scopes: SCOPES,
+    keyfilePath: CREDENTIALS_PATH,
+  });
+  await saveCredentials(client);
+  return client;
+}
+
 module.exports = {
     authorize,
+    reauth,
 };
