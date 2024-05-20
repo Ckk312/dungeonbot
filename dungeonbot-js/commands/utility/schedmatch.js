@@ -48,7 +48,7 @@ const data = new SlashCommandBuilder()
                 { name: 'Rocket League', value: 'rl' },
                 { name: 'Splatoon', value: 'spl' },
                 { name: 'Super Smash Bros.', value: 'ssb' },
-                { name: 'Valorant', value: 'val' },
+                { name: 'VALORANT', value: 'val' },
             ))
     .addStringOption(option =>
         option

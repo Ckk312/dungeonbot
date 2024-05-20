@@ -12,7 +12,7 @@ const data = new SlashCommandBuilder()
     .addStringOption(option =>
         option
             .setName('message-id')
-            .setDescription('The id of the message.')
+            .setDescription('The id of the message. (NOT THE URL)')
             .setRequired(true),
     )
     .addStringOption(option =>
