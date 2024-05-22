@@ -57,14 +57,14 @@ module.exports = {
                 try {
                     const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
                     info = JSON.parse(file);
-                } catch(e) {
+                } catch (e) {
                     await interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
                     console.error(e);
                     return;
                 }
 
                 if (!interaction.member.roles.cache.has('899044671119061072')) {
-                    await interaction.reply({ content: `You do not have the "Title Manager" role to complete this command.`, ephemeral: true });
+                    await interaction.reply({ content: 'You do not have the "Title Manager" role to complete this command.', ephemeral: true });
                     return;
                 }
 

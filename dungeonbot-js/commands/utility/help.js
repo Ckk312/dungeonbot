@@ -3,6 +3,31 @@ const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
 
+function createEmbed(command, bot, curPage, length) {
+    const embed = new EmbedBuilder()
+        .setAuthor({ name: bot.dn, iconURL: bot.daURL })
+        .setThumbnail(bot.daURL)
+        .setTitle('**DungeonBot Help Commands**')
+        .setDescription('*Page ' + curPage + '/' + length + '*')
+        .addFields({ name: 'Command: ' + command.name, value: command.description });
+
+    if (command.fields) {
+        embed.addFields({ name: '\u200b**PARAMETERS**', value: ' ' });
+
+        let i = 1;
+        for (const field of command.fields) {
+            if ((i % 4) === 0) {
+                embed.addFields({ name: ' ', value: ' ' });
+                i++;
+            }
+            embed.addFields({ name: field.name, value: field.desc + '\n**REQUIRED:** ' + field.required, inline: true });
+            i++;
+        }
+    }
+
+    return embed;
+}
+
 const data = new SlashCommandBuilder()
     .setName('help')
     .setDescription('Displays all commands.');
@@ -10,24 +35,24 @@ const data = new SlashCommandBuilder()
 async function execute(interaction) {
     let i = 1;
     let commands;
-    const bot = interaction.client.application.bot;
-    const HELP_PATH = path.join(process.cwd(), '../assets/help.json');
+    await interaction.client.application.fetch();
+    const bot = {
+        dn: interaction.client.application.name,
+        daURL: interaction.client.application.iconURL(),
+    };
+    console.log(bot.dn + '\n' + bot.daURL);
+    const HELP_PATH = path.join(process.cwd(), 'commands/assets/help.json');
     try {
-        const file = fs.readFileSync(HELP_PATH);
-        commands = file.toJSON();
+        const file = await fs.readFile(HELP_PATH);
+        commands = JSON.parse(file);
     } catch (e) {
         console.error(e);
         throw e;
     }
 
-    let embed = new EmbedBuilder()
-        .setAuthor({ name: bot.displayName, iconURL: bot.defaultAvatarURL })
-        .setThumbnail(bot.defaultAvatarURL)
-        .setTitle('**DungeonBot Help Commands**')
-        .setDescription('Page ' + i + '/' + commands.length)
-        .addField({ name: commands[i - 1].name, value: commands[i - 1].description });
+    const pageLength = commands.length;
 
-    for ()
+    let embed = createEmbed(commands[i - 1], bot, i, pageLength);
 
     const previous = new ButtonBuilder()
         .setCustomId('prev')
@@ -40,14 +65,36 @@ async function execute(interaction) {
         .setStyle(ButtonStyle.Primary);
 
     const row = new ActionRowBuilder()
-        .addComponents(next, previous);
+        .addComponents(previous, next);
 
-    const response = await interaction.reply({ embeds: [embed], row: [row], ephemeral: true });
+    const response = await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
 
-    try {
-        await response.awaitMessageComponent({ filter: null, time: 120_000 });
-    } catch (e) {
-        interaction.deleteReply();
+    const loop = true;
+    while (loop) {
+        try {
+            const confirmation = await response.awaitMessageComponent({ filter: null, time: 120_000 });
+
+            if (confirmation.customId === 'prev') {
+                i--;
+                if (i < 1) {
+                    i = pageLength;
+                }
+                embed = createEmbed(commands[i - 1], bot, i, pageLength);
+            }
+
+            if (confirmation.customId === 'next') {
+                i++;
+                if (i > pageLength) {
+                    i = 1;
+                }
+                embed = createEmbed(commands[i - 1], bot, i, pageLength);
+            }
+
+            await confirmation.update({ embeds: [embed], components: [row] });
+        } catch (e) {
+            await interaction.deleteReply();
+            return;
+        }
     }
 }
 
