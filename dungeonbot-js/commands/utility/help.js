@@ -40,7 +40,6 @@ async function execute(interaction) {
         dn: interaction.client.application.name,
         daURL: interaction.client.application.iconURL(),
     };
-    console.log(bot.dn + '\n' + bot.daURL);
     const HELP_PATH = path.join(process.cwd(), 'commands/assets/help.json');
     try {
         const file = await fs.readFile(HELP_PATH);
