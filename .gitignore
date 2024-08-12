@@ -90,9 +90,12 @@ lerna-debug.log
 .DS_Store
 Thumbs.db
 
-# files to hide
+# hidden files
 config.json
 googlecalendar/token.json
 googlecalendar/credentials.json
 dungeonbot-js/googlecalendar/token.json
 dungeonbot-js/googlecalendar/credentials.json
+
+# hidden directories
+dungeonbot-js/commands/guilds/
