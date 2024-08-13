@@ -5,8 +5,8 @@ const data = new SlashCommandBuilder()
     .setDescription('Edits a message belonging to this bot')
     .addStringOption(option =>
         option
-            .setName('message-channel')
-            .setDescription('Channel the message was sent in.')
+            .setName('message-channel-id')
+            .setDescription('Channel id of where the message was sent in.')
             .setRequired(true),
     )
     .addStringOption(option =>
@@ -30,7 +30,7 @@ async function execute(interaction) {
     // try to edit the message if it exists. Fail otherwise
     try {
         const msg = await channel.messages.fetch(interaction.options.getString('message-id'));
-        await msg.edit(interaction.options.getString('message-body'));
+        await msg.edit(interaction.options.getString('message-body-id'));
         await interaction.editReply({ content: 'Message has been edited ' + msg.url, ephemeral: true });
     } catch (e) {
         console.error(e);
