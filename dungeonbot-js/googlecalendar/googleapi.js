@@ -65,13 +65,16 @@ async function authorize() {
   return client;
 }
 
-/**
- * Lists the next 10 events on the user's primary calendar.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
+async function reauth() {
+  const client = await authenticate({
+    scopes: SCOPES,
+    keyfilePath: CREDENTIALS_PATH,
+  });
+  await saveCredentials(client);
+  return client;
+}
 
 module.exports = {
-    activate() {
-        authorize();
-    }
+    authorize,
+    reauth,
 };

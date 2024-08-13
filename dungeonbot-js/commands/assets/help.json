@@ -1,0 +1,184 @@
+[
+    {
+        "name" : "reserve",
+        "description" : "Reserves a time on the Dungeon Reservation Calendar.\n*Intended for use by Title Managers and Officers.*",
+        "fields" : [
+            {
+                "name" : "month",
+                "desc" : "Sets the month of the reservation.",
+                "required" : true
+            },
+            {
+                "name" : "day",
+                "desc" : "Sets the date number of the reservation.",
+                "required" : true
+            },
+            {
+                "name" : "startHour",
+                "desc" : "Sets the start hour of the reservation.",
+                "required" : true
+            },
+            {
+                "name" : "am-pm1",
+                "desc" : "Sets the AM/PM for the hour.",
+                "required" : true
+            },
+            {
+                "name" : "title",
+                "desc" : "Sets the title of the reservation.",
+                "required" : true
+            }
+        ]
+    },
+    {
+        "name" : "schedmatch",
+        "description" : "Schedules a match onto the corresponding Google Calendar and posts the match information in the appropriate channel.\n*Intended for use by Title Managers and Officers.*",
+        "fields" : [
+            {
+                "name" : "game",
+                "desc" : "Sets the game of the event.",
+                "required" : true,
+                "choices" : [
+                    "Apex Legends",
+                    "Call of Duty",
+                    "Counterstrike",
+                    "League of Legends",
+                    "Overwatch",
+                    "Rainbow Six: Siege",
+                    "Rocket League",
+                    "Splatoon",
+                    "Super Smash Bros.",
+                    "VALORANT"
+                ]
+            },
+            {
+                "name" : "team",
+                "desc" : "Specifies what type of team is playing.",
+                "required" : true,
+                "choices" : [
+                    "UCF Knights",
+                    "UCF Knights Academy",
+                    "UCF Knights Gold",
+                    "UCF Knights Black",
+                    "UCF Knights White"
+                ]
+            },
+            {
+                "name" : "month",
+                "desc" : "Sets the month of the event.",
+                "required" : true
+            },
+            {
+                "name" : "day",
+                "desc" : "Sets the date number of the event.",
+                "required" : true
+            },
+            {
+                "name" : "hour",
+                "desc" : "Sets the hour of the event.",
+                "required" : true
+            },
+            {
+                "name" : "minute",
+                "desc" : "Sets the minute of the event.",
+                "required" : true
+            },
+            {
+                "name" : "am-pm",
+                "desc" : "Sets the AM/PM of the hour.",
+                "required" : true
+            },
+            {
+                "name" : "title",
+                "desc" : "Sets the title of the event.",
+                "required" : true
+            },
+            {
+                "name" : "event-league",
+                "desc" : "Sets the event or league of the event.",
+                "required" : true
+            },
+            {
+                "name" : "opponent",
+                "desc" : "Sets the opposing University of the event.",
+                "required" : true
+            },
+            {
+                "name" : "bracket-link",
+                "desc" : "Sets the link of the bracket of the event.",
+                "required" : true
+            },
+            {
+                "name" : "stream-link",
+                "desc" : "Sets the link of the stream of the event.",
+                "required" : false
+            },
+            {
+                "name" : "opponent-socials",
+                "desc" : "Sets the socials of the opponent.",
+                "required" : false
+            },
+            {
+                "name" : "hashtag",
+                "desc" : "Sets the hashtags of the event.",
+                "required" : false
+            }
+        ]
+    },
+    {
+        "name" : "write",
+        "description" : "Creates a message in a specified channel sent by the bot.\n*Must have edit message permissions*",
+        "fields" : [
+            {
+                "name" : "channel",
+                "desc" : "Selects the channel where the message will be sent.",
+                "required" : true
+            },
+            {
+                "name" : "message",
+                "desc" : "The body of the message to be sent.",
+                "required" : true
+            }
+        ]
+    },
+    {
+        "name" : "edit",
+        "description" : "Edits a message that has been sent by the bot.\n*Same permissions as /write.*",
+        "fields" : [
+            {
+                "name" : "channel",
+                "desc" : "Selects the channel in which the message has been sent.",
+                "required" : true
+            },
+            {
+                "name" : "message-id",
+                "desc" : "The ID of the message to be edited.",
+                "required" : true
+            },
+            {
+                "name" : "message-body",
+                "desc" : "The new text of the message to be edited.",
+                "required" : true
+            }
+        ]
+    },
+    {
+        "name" : "setchannel",
+        "description" : "Sets a dedicated channel for a command.\n*Must have manage channel permissions*",
+        "fields" : [
+            {
+                "name" : "command",
+                "desc" : "Selects a command from a list.",
+                "required" : true,
+                "choices" : [
+                    "schedmatch"
+                ]
+            },
+            {
+                "name" : "channel",
+                "desc" : "Selects a channel to dedicate for the command.",
+                "required" : true
+            }
+        ]
+    }
+]

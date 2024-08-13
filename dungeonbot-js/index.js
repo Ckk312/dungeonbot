@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const fs = require('node:fs');
 const path = require('node:path');
 const process = require('process');
-const { activate } = require('./googlecalendar/googleapi.js');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
 // enable config for dotenv functionality
@@ -16,9 +15,12 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // Create a list of all commands in client
 client.commands = new Collection();
 
+// Create a list of all command cooldowns in client
+client.cooldowns = new Collection();
+
 // add commands from directories of commands
 const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath).filter(file => file.endsWith('.js'));
+const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
@@ -27,7 +29,7 @@ for (const folder of commandFolders) {
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
-    
+
         if ('data' in command && 'execute' in command) {
             client.commands.set(command.data.name, command);
         }
@@ -51,8 +53,6 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
-
-activate();
 
 // Log into Discord
 client.login(process.env.TOKEN);

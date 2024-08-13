@@ -1,52 +1,75 @@
+const { authorize, reauth } = require('./googlecalendar/googleapi.js');
+const { listEvents } = require('./googlecalendar/utility/listevents.js');
+const { createMessage } = require('./createmessage.js');
+
 // function in case of most days
-function normalDay(time) {
-    let dayInc = 0;
-    if (time.getDay() == 5 || time.getDay() == 6) {
+function weekDay(time) {
+    let dayInc, hour;
+    if (time.getDay() == 6 || time.getDay() == 0) {
         return;
     }
 
-    dayInc = time.getHours() < 7 ? 0:1;
+    if (time.getHours() < 7) {
+        dayInc = 0;
+        hour = 7;
+    } else {
+        dayInc = 1;
+        hour = time.getDay() == 5 ? 9 : 7;
+    }
 
-    const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 7);
+    const nextDay = new Date(time.getFullYear(),
+        time.getMonth(), time.getDate() + dayInc, hour);
     return nextDay;
 }
 
 // function in case the day is friday
-function friday(time) {
-    let dayInc;
-    if (time.getDay() != 5) {
+function saturday(time) {
+    let dayInc, hour;
+    if (time.getDay() != 6) {
         return;
     }
 
-    dayInc = time.getHours() < 9 ? 0:1;
+    if (time.getHours() < 9) {
+        dayInc = 0;
+        hour = 9;
+    } else {
+        dayInc = 1;
+        hour = 11;
+    }
 
-    const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 9);
+    const nextDay = new Date(time.getFullYear(),
+        time.getMonth(), time.getDate() + dayInc, hour);
     return nextDay;
 }
 
 // function in case the day is saturday
-function saturday(time) {
-    let dayInc;
-    if (time.getDay() != 5) {
+function sunday(time) {
+    let dayInc, hour;
+    if (time.getDay() != 0) {
         return;
     }
 
-    dayInc = time.getHours() < 11 ? 0:1;
+    if (time.getHours() < 11) {
+        dayInc = 0;
+        hour = 11;
+    } else {
+        dayInc = 1;
+        hour = 7;
+    }
 
-    const nextDay = new Date(time.getFullYear(), 
-        time.getMonth(), time.getDate() + dayInc, 11);
+    const nextDay = new Date(time.getFullYear(),
+        time.getMonth(), time.getDate() + dayInc, hour);
     return nextDay;
 }
 
 // constant variables for no. of seconds in a day
 // or day plus 2 hours
 const day = 86400 * 1_000;
-const dayPlus2Hours = (86400 + 3600) * 1_000;
+const dayPlus2Hours = (86400 + 7200) * 1_000;
+const dayMinus4Hours = (86400 - 14400) * 1_000;
 let difference;
 
-// find the difference between now and the next 
+// find the difference between now and the next
 // time the SU opens
 function findCurrentDifference() {
     const now = new Date();
@@ -54,8 +77,8 @@ function findCurrentDifference() {
     let tmrOpening;
 
     switch (currentDay) {
-        case 5:
-            tmrOpening = friday(now);
+        case 0:
+            tmrOpening = sunday(now);
             break;
 
         case 6:
@@ -63,42 +86,73 @@ function findCurrentDifference() {
             break;
 
         default:
-            tmrOpening = normalDay(now);
+            tmrOpening = weekDay(now);
             break;
     }
 
-    difference = tmrOpening.getTime() - now.getTime();
-
-    return difference;
+    return tmrOpening;
 }
 
-// send message and then recurse the function with 
-// a delay
-async function sendMessage(client, schedule) {
-    let sec, min, hour;
-    const date = new Date();
+async function msgLoop(client, schedule) {
+    if (!schedule) {
+        return;
+    }
+
     const channel = await client
         .channels
         .cache
         .get('763248812558778378');
     channel.send(schedule);
+}
 
-    if (date.getDay() == 5 || date.getDay() == 6) {
-        difference = dayPlus2Hours;
-    } else {
-        difference = day;
+/**
+ * Sends message and recurses with delay
+ *
+ * @param {*} client Discord client instance
+ * @param { string } schedule Message string
+ */
+async function sendMessage(client, schedule) {
+    msgLoop(client, schedule);
+
+    const value = true;
+    while (value) {
+        const date = new Date();
+        if (date.getDay() == 5 || date.getDay() == 6) {
+            difference = dayPlus2Hours;
+        }
+        else if (date.getDay() == 0) {
+            difference = dayMinus4Hours;
+        }
+        else {
+            difference = day;
+        }
+
+        const info = {
+            auth: await authorize(),
+            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+            date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+        };
+
+        let newMessage = null;
+        try {
+            newMessage = createMessage(await listEvents(info));
+        } catch (e) {
+            console.error(e);
+            await reauth();
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client, newMessage));
+
+        // print next function call
+        const sec = (difference / 1000) % 60;
+        const min = (difference / 60000) % 60;
+        const hour = difference / (3600000);
+        console.log(`Next Schedule Update in ${Math.floor(hour)} hrs ${Math.floor(min)} min and ${Math.round(sec)} sec ...`);
     }
-
-    setTimeout(sendMessage, difference, client, schedule);
-
-    sec = (difference / 1000) % 60;
-    min = (difference / 60000) % 60;
-    hour = difference / (3600 * 6000);
-    console.log(`Next Schedule Update in ${hour.toPrecision(2)} hrs ${min.toFixed(0)} min and ${sec.toFixed(0)} sec ...`);
 }
 
 // list of exports
 module.exports = {
     findCurrentDifference,
-    sendMessage
-}
+    sendMessage,
+};
