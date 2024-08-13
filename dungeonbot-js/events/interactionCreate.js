@@ -86,7 +86,7 @@ module.exports = {
 
                 break;
             default:
-                if (!info[interaction.commandName]) {
+                if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
                     return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
                 }
 
