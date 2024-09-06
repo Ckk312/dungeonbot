@@ -64,9 +64,9 @@ function sunday(time) {
 
 // constant variables for no. of seconds in a day
 // or day plus 2 hours
-const day = 86400 * 1_000;
-const dayPlus2Hours = (86400 + 7200) * 1_000;
-const dayMinus4Hours = (86400 - 14400) * 1_000;
+const DAY = 86400 * 1_000;
+const DAYPLUS2HOURS = (86400 + 7200) * 1_000;
+const DAYPLUS4HOURS = (86400 - 14400) * 1_000;
 let difference;
 
 // find the difference between now and the next
@@ -93,55 +93,52 @@ function findCurrentDifference() {
     return tmrOpening;
 }
 
-async function msgLoop(client, schedule) {
-    if (!schedule) {
+async function msgLoop(client) {
+    if (!client) {
         return;
+    }
+
+    const info = {
+        auth: await authorize(),
+        calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+        date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+    };
+
+    let newMessage = null;
+    try {
+        newMessage = createMessage(await listEvents(info));
+    } catch (e) {
+        console.error(e);
+        await reauth();
     }
 
     const channel = await client
         .channels
         .cache
         .get('1144375225488769069');
-    channel.send(schedule);
+    channel.send(newMessage);
 }
 
 /**
  * Sends message and recurses with delay
  *
  * @param {*} client Discord client instance
- * @param { string } schedule Message string
  */
-async function sendMessage(client, schedule) {
-    msgLoop(client, schedule);
-
+async function sendMessage(client) {
     const value = true;
     while (value) {
-        const date = new Date();
+        let date = new Date();
         if (date.getDay() == 5 || date.getDay() == 6) {
-            difference = dayPlus2Hours;
+            difference = DAYPLUS2HOURS;
         }
         else if (date.getDay() == 0) {
-            difference = dayMinus4Hours;
+            difference = DAYPLUS4HOURS;
         }
         else {
-            difference = day;
+            difference = DAY;
         }
 
-        const info = {
-            auth: await authorize(),
-            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-            date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
-        };
-
-        let newMessage = null;
-        try {
-            newMessage = createMessage(await listEvents(info));
-        } catch (e) {
-            console.error(e);
-            await reauth();
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client, newMessage));
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client));
 
         // print next function call
         const sec = (difference / 1000) % 60;

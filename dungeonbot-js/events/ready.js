@@ -12,27 +12,10 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag} \n ${today}`);
 
         // start recursive daily function
-        let eventList;
         const date = reminderSched.findCurrentDifference();
         const msDiff = date.getTime() - today.getTime();
-        const auth = await authorize();
-        const eventInfo = {
-            auth: auth,
-            calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
-            date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-        };
-        try {
-            eventList = await listEvents(eventInfo);
-        } catch (e) {
-            console.error(e);
-            eventInfo.auth = await reauth();
-        }
 
-        eventList = await listEvents(eventInfo);
-
-        console.log(eventList);
-
-        setTimeout(await reminderSched.sendMessage, msDiff, client, createMessage(eventList));
+        setTimeout(await reminderSched.sendMessage, msDiff, client);
 
         // print next function call
         const sec = (msDiff / 1000) % 60;
