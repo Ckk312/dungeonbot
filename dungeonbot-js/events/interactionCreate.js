@@ -67,13 +67,15 @@ module.exports = {
 
         // do actions based on command
         switch (interaction.commandName) {
+            case 'setchannel':
+                break;
             case 'schedmatch':
                 if (!info.schedmatch) {
                     return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
                 }
 
                 if (!info.TM_ROLE_ID) {
-                    info['TM_ROLE_ID'] = '899044671119061072';
+                    info['TM_ROLE_ID'] = '770517986826125313';
                 }
 
                 if (info[interaction.commandName] != interaction.channel.id) {
@@ -81,13 +83,21 @@ module.exports = {
                 }
 
                 if (!interaction.member.roles.cache.has(info.TM_ROLE_ID)) {
-                    return await interaction.reply({ content: 'You do not have the "Title Manager" role to complete this command.', ephemeral: true });
+                    return await interaction.reply({ content: 'You do not have the "MANAGERIAL STAFF" role to complete this command.', ephemeral: true });
                 }
 
                 break;
             default:
-                if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
+                if (info[interaction.commandName] != interaction.channel.id && !info.defaultId) {
                     return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
+                }
+                else if (!info[interaction.commandName] && interaction.channel.id != info.defaultId) {
+                    const defaultChannel = await interaction.client.channels.fetch(info.defaultId);
+                    return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
+                }
+                else if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
+                    const newChannel = await interaction.client.channels.fetch(info.comandName);
+                    return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
                 }
 
                 break;
