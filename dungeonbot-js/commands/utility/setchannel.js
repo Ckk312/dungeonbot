@@ -10,12 +10,8 @@ const data = new SlashCommandBuilder()
     .setDescription('Set the channel for the specific command')
     .addStringOption(option =>
         option.setName('command')
-            .setDescription('Pick from one of the commands.')
-            .setRequired(true)
-            .addChoices(
-                { name: 'schedmatch', value: 'schedmatch' },
-                { name: 'default', value: 'defaultId' },
-            ))
+            .setDescription('Select a command.')
+            .setRequired(true))
     .addChannelOption(option =>
         option.setName('channel')
             .setRequired(true)
@@ -23,7 +19,20 @@ const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 async function execute(interaction) {
+    let found = false;
     await interaction.deferReply({ ephemeral: true });
+    for (const command of interaction.client.commands) {
+        if (command === interaction.options.getString('command')) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        interaction.editReply({ content: `Command ${interaction.options.getString('command')} does not exist.`, ephemeral: true });
+        return;
+    }
+
     let object = {};
     // read file guild folder path
     try {
