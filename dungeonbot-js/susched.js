@@ -93,7 +93,7 @@ function findCurrentDifference() {
     return tmrOpening;
 }
 
-async function msgLoop(client) {
+async function sendMessage(client, date) {
     if (!client) {
         return;
     }
@@ -124,10 +124,11 @@ async function msgLoop(client) {
  *
  * @param {*} client Discord client instance
  */
-async function sendMessage(client) {
+async function scheduler(client) {
     const value = true;
+    sendMessage(client, new Date());
     while (value) {
-        let date = new Date();
+        const date = new Date();
         if (date.getDay() == 5 || date.getDay() == 6) {
             difference = DAYPLUS2HOURS;
         }
@@ -138,7 +139,7 @@ async function sendMessage(client) {
             difference = DAY;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client));
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => sendMessage(client, date));
 
         // print next function call
         const sec = (difference / 1000) % 60;
@@ -151,5 +152,5 @@ async function sendMessage(client) {
 // list of exports
 module.exports = {
     findCurrentDifference,
-    sendMessage,
+    scheduler,
 };

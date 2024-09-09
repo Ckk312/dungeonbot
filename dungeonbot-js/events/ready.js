@@ -1,8 +1,5 @@
 const { Events } = require('discord.js');
-const { authorize, reauth } = require('../googlecalendar/googleapi.js');
-const { listEvents } = require('../googlecalendar/utility/listevents.js');
-const { createMessage } = require('../createmessage.js');
-const reminderSched = require('../susched.js');
+const { findCurrentDifference, scheduler } = require('../susched.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -12,10 +9,10 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag} \n ${today}`);
 
         // start recursive daily function
-        const date = reminderSched.findCurrentDifference();
+        const date = findCurrentDifference();
         const msDiff = date.getTime() - today.getTime();
 
-        setTimeout(await reminderSched.sendMessage, msDiff, client);
+        setTimeout(await scheduler, msDiff, client);
 
         // print next function call
         const sec = (msDiff / 1000) % 60;
