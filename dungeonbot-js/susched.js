@@ -101,7 +101,7 @@ async function msgLoop(client, schedule) {
     const channel = await client
         .channels
         .cache
-        .get('763248812558778378');
+        .get('1144375225488769069');
     channel.send(schedule);
 }
 
