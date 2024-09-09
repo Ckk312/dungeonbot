@@ -93,10 +93,12 @@ function findCurrentDifference() {
     return tmrOpening;
 }
 
-async function sendMessage(client, date) {
+async function sendMessage(client) {
     if (!client) {
         return;
     }
+
+    const date = new Date();
 
     const info = {
         auth: await authorize(),
@@ -126,7 +128,7 @@ async function sendMessage(client, date) {
  */
 async function scheduler(client) {
     const value = true;
-    sendMessage(client, new Date());
+    sendMessage(client);
     while (value) {
         const date = new Date();
         if (date.getDay() == 5 || date.getDay() == 6) {
@@ -139,7 +141,7 @@ async function scheduler(client) {
             difference = DAY;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => sendMessage(client, date));
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => sendMessage(client));
 
         // print next function call
         const sec = (difference / 1000) % 60;
