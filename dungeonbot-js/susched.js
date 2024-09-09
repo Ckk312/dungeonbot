@@ -153,6 +153,7 @@ async function scheduler(client) {
 
 // list of exports
 module.exports = {
-    findCurrentDifference,
     scheduler,
+    sendMessage,
+    findCurrentDifference,
 };
