@@ -14,7 +14,6 @@ const data = new SlashCommandBuilder()
             .setRequired(true)
             .addChoices(
                 { name: 'schedmatch', value: 'schedmatch' },
-                { name: 'default', value: 'defaultId' },
             ))
     .addChannelOption(option =>
         option.setName('channel')
@@ -23,7 +22,7 @@ const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 async function execute(interaction) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
     let object = {};
     // read file guild folder path
     try {
@@ -36,7 +35,7 @@ async function execute(interaction) {
     object[interaction.options.getString('command')] = interaction.options.getChannel('channel').id;
     // write to json and reply
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
-    await interaction.editReply({ content: interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'), ephemeral: true });
+    await interaction.editReply(interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'));
 }
 
 module.exports = {
