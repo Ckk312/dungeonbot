@@ -1,4 +1,5 @@
-const { Events, Collection } = require('discord.js');
+/* eslint-disable no-lonely-if */
+const { Events, Collection, PermissionsBitField } = require('discord.js');
 const fs = require('fs').promises;
 const path = require('path');
 const process = require('process');
@@ -36,7 +37,7 @@ module.exports = {
         const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1_000;
 
         // find if there is a cooldown and respond if they do
-        if (timestamps.has(interaction.user.id)) {
+        if (timestamps.has(interaction.user.id) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
 
             // check if cooldown has expired
@@ -61,46 +62,31 @@ module.exports = {
                 info = {};
                 await fs.writeFile(COMMAND_CHANNEL_ID_PATH, JSON.stringify(info), 'utf8');
             } catch (error) {
-                return await interaction.reply({ content: 'Unexpected Error has Occurred.', ephemeral: true });
+                return await interaction.reply({ content: 'Unexpected Error has occurred.', ephemeral: true });
             }
         }
 
+        if (!info.TM_ROLE_ID) {
+            info['TM_ROLE_ID'] = '770517986826125313';
+        }
+
         // do actions based on command
-        switch (interaction.commandName) {
-            case 'setchannel':
-                break;
-            case 'schedmatch':
-                if (!info.schedmatch) {
-                    return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
-                }
-
-                if (!info.TM_ROLE_ID) {
-                    info['TM_ROLE_ID'] = '770517986826125313';
-                }
-
-                if (info[interaction.commandName] != interaction.channel.id) {
-                    return await interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
-                }
-
-                if (!interaction.member.roles.cache.has(info.TM_ROLE_ID)) {
-                    return await interaction.reply({ content: 'You do not have the "MANAGERIAL STAFF" role to complete this command.', ephemeral: true });
-                }
-
-                break;
-            default:
-                if (info[interaction.commandName] != interaction.channel.id && !info.defaultId) {
-                    return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
-                }
-                else if (!info[interaction.commandName] && interaction.channel.id != info.defaultId) {
-                    const defaultChannel = await interaction.client.channels.fetch(info.defaultId);
-                    return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
-                }
-                else if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
-                    const newChannel = await interaction.client.channels.fetch(info.comandName);
-                    return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
-                }
-
-                break;
+        if (info[interaction.commandName] !== interaction.channel.id && !info.default) {
+            return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
+        }
+        else if (!info[interaction.commandName] && interaction.channel.id !== info.default) {
+            const defaultChannel = await interaction.client.channels.fetch(info.default);
+            return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
+        }
+        else if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
+            const newChannel = await interaction.client.channels.fetch(info[interaction.commandName]);
+            return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
+        }
+        if (interaction.commandName === 'setchannel' || interaction.commandName === 'schedmatch') {
+            if (!interaction.member.roles.cache.has(info.TM_ROLE_ID) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                timestamps.delete(interaction.user.id);
+                return await interaction.reply({ content: 'You do not have the "MANAGERIAL STAFF" role to complete this command.', ephemeral: true });
+            }
         }
 
         // attempt to execute interaction

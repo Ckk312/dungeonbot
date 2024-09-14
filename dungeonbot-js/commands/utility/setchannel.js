@@ -10,7 +10,7 @@ const data = new SlashCommandBuilder()
     .setDescription('Set the channel for the specific command')
     .addStringOption(option =>
         option.setName('command')
-            .setDescription('Select a command.')
+            .setDescription('Select a command or type "Default" for a default command channel.')
             .setRequired(true))
     .addChannelOption(option =>
         option.setName('channel')
@@ -42,7 +42,7 @@ async function execute(interaction) {
         console.log('File could not be found.');
     }
     // specify the channel id of the command
-    object[interaction.options.getString('command')] = interaction.options.getChannel('channel').id;
+    object[interaction.options.getString('command').toLowerCase()] = interaction.options.getChannel('channel').id;
     // write to json and reply
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
     await interaction.editReply({ content: interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'), ephemeral: true });
