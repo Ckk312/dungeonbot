@@ -66,22 +66,29 @@ module.exports = {
             }
         }
 
+        // Add TM_ROLE_ID to json if doesn't exist
         if (!info.TM_ROLE_ID) {
             info['TM_ROLE_ID'] = '770517986826125313';
+            fs.writeFile(COMMAND_CHANNEL_ID_PATH, JSON.stringify(info), 'utf8');
         }
 
-        // do actions based on command
+        // ensure command is sent in the correct channel
         if (info[interaction.commandName] !== interaction.channel.id && !info.default) {
+            timestamps.delete(interaction.user.id);
             return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
         }
         else if (!info[interaction.commandName] && interaction.channel.id !== info.default) {
             const defaultChannel = await interaction.client.channels.fetch(info.default);
+            timestamps.delete(interaction.user.id);
             return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
         }
         else if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
             const newChannel = await interaction.client.channels.fetch(info[interaction.commandName]);
+            timestamps.delete(interaction.user.id);
             return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
         }
+
+        // check for role to execute command
         if (interaction.commandName === 'setchannel' || interaction.commandName === 'schedmatch') {
             if (!interaction.member.roles.cache.has(info.TM_ROLE_ID) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
                 timestamps.delete(interaction.user.id);
