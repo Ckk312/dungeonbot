@@ -10,11 +10,8 @@ const data = new SlashCommandBuilder()
     .setDescription('Set the channel for the specific command')
     .addStringOption(option =>
         option.setName('command')
-            .setDescription('Pick from one of the commands.')
-            .setRequired(true)
-            .addChoices(
-                { name: 'schedmatch', value: 'schedmatch' },
-            ))
+            .setDescription('Select a command or type "Default" for a default command channel.')
+            .setRequired(true))
     .addChannelOption(option =>
         option.setName('channel')
             .setRequired(true)
@@ -22,7 +19,20 @@ const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 async function execute(interaction) {
-    await interaction.deferReply();
+    let found = false;
+    await interaction.deferReply({ ephemeral: true });
+    for (const command of interaction.client.commands) {
+        if (command === interaction.options.getString('command')) {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        interaction.editReply({ content: `Command ${interaction.options.getString('command')} does not exist.`, ephemeral: true });
+        return;
+    }
+  
     let object = {};
     // read file guild folder path
     try {
@@ -32,7 +42,7 @@ async function execute(interaction) {
         console.log('File could not be found.');
     }
     // specify the channel id of the command
-    object[interaction.options.getString('command')] = interaction.options.getChannel('channel').id;
+    object[interaction.options.getString('command').toLowerCase()] = interaction.options.getChannel('channel').id;
     // write to json and reply
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
     await interaction.editReply(interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'));

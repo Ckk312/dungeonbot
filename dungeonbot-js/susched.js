@@ -93,11 +93,26 @@ function findCurrentDifference() {
     return tmrOpening;
 }
 
-async function msgLoop(client, schedule) {
-    if (!schedule) {
+async function sendMessage(client) {
+    if (!client) {
         return;
     }
 
+    const date = new Date();
+
+    const info = {
+        auth: await authorize(),
+        calendarId: '96b429f6e1f87660f0d72044faae4b65eba175e1edef273abc974b331a8c425e@group.calendar.google.com',
+        date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+    };
+
+    let newMessage = null;
+    try {
+        newMessage = createMessage(await listEvents(info));
+    } catch (e) {
+        console.error(e);
+        await reauth();
+    }
     const channel = await client
         .channels
         .cache
@@ -111,10 +126,9 @@ async function msgLoop(client, schedule) {
  * @param {*} client Discord client instance
  * @param { string } schedule Message string
  */
-async function sendMessage(client, schedule) {
-    msgLoop(client, schedule);
-
+async function scheduler(client) {
     const value = true;
+    sendMessage(client);
     while (value) {
         const date = new Date();
         if (date.getDay() == 5 || date.getDay() == 6) {
@@ -141,7 +155,7 @@ async function sendMessage(client, schedule) {
             await reauth();
         }
 
-        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => msgLoop(client, newMessage));
+        await new Promise((resolve) => setTimeout(resolve, difference)).then(() => sendMessage(client));
 
         // print next function call
         const sec = (difference / 1000) % 60;
@@ -153,6 +167,7 @@ async function sendMessage(client, schedule) {
 
 // list of exports
 module.exports = {
-    findCurrentDifference,
+    scheduler,
     sendMessage,
+    findCurrentDifference,
 };

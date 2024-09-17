@@ -58,9 +58,8 @@ const data = new SlashCommandBuilder()
             .addChoices(
                 { name: 'UCF Knights', value: 'UCF Knights' },
                 { name: 'UCF Knights Academy', value: 'UCF Knights Academy' },
-                { name: 'UCF Knights Gold', value: 'UCF Knights Gold' },
-                { name: 'UCF Knights Black', value: 'UCF Knights Black' },
-                { name: 'UCF Knights White', value: 'UCF Knights White' },
+                { name: 'UCF Knights Rising', value: 'UCF Knights Rising' },
+                { name: 'UCF Knights Pink', value: 'UCF Knights Pink' },
             ))
     .addIntegerOption(option =>
         option
@@ -164,22 +163,22 @@ async function execute(interaction) {
 
     // string to reply with and it's editions
     let replyStr = `\`\`\`yaml\nDate/Time: ${date.toString()} <t:${date.getTime() / 1000}:F>\nTitle: ${matchInfo.title}
-        \nEvent/League and Description: ${matchInfo.eventLeague}\nOpponent: ${matchInfo.opponent}\nBracket: ${matchInfo.bracket}\nSocials:`;
+        \nEvent/League and Description: ${matchInfo.eventLeague}\nOpponent: ${matchInfo.opponent}\nBracket: ${matchInfo.bracket}\nSocials: `;
 
     if (matchInfo.socials) {
-        replyStr += ` ${matchInfo.socials}`;
+        replyStr += `${matchInfo.socials}\n`;
     }
 
-    replyStr += 'Hashtags: ';
+    replyStr += '\nHashtags: ';
 
     if (matchInfo.hashtags) {
-        replyStr += ` ${matchInfo.hashtags}`;
+        replyStr += `${matchInfo.hashtags}`;
     }
 
-    replyStr += 'Stream: ';
+    replyStr += '\nStream: ';
 
     if (matchInfo.stream) {
-        replyStr += ` ${matchInfo.stream}\n`;
+        replyStr += ` ${matchInfo.stream}`;
     }
 
     replyStr += '```';
@@ -222,6 +221,7 @@ async function execute(interaction) {
     if (confirmation?.customId === 'confirm') {
         // google api calendar
         const assets = await loadTitleAssets(matchInfo.game);
+        matchInfo.fullName = assets.fullName;
         const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), (date.getHours() + 2), date.getMinutes());
 
         // post to all matches calendar
@@ -242,7 +242,7 @@ async function execute(interaction) {
         // post to specific games' calendar
         info.calendarId = assets.calendar;
         eb = new EventBuilder()
-            .setEventInfo(matchInfo)
+            .setMatchInfo(matchInfo)
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
         info.eventResource = eb.toJSON();
@@ -251,7 +251,7 @@ async function execute(interaction) {
         // respond based on google calendar api
         if (eventExist) {
             interaction.editReply({
-                content: 'Event has been created on Google Calendar as well.',
+                content: 'Event has been created on [Google Calendar](https://eucf.link/matches) as well.',
                 components: [],
                 ephemeral: true,
             });
@@ -284,7 +284,12 @@ async function execute(interaction) {
                     { name: 'Relevant Hashtags', value: '**' + matchInfo.hashtags + '**', inline: true },
                 );
             }
-            await interaction.channel.send({ embeds: [matchEmbed] });
+            await interaction
+            .client
+            .channels
+            .cache
+            .get('939988890868134019')
+            .send({ embeds: [matchEmbed] });
         } else {
             interaction.editReply({
                 content: 'Creation on Google Calendar failed.',

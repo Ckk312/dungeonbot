@@ -72,7 +72,7 @@ class EventBuilder {
      * @returns
      */
     setMatchInfo(match) {
-        let description = `${match.team} vs ${match.opponent} in ${match.eventLeague}.\nBracket found <a href="${match.bracket}">here</a>.`;
+        let description = `${match.fullName}\n${match.team} vs ${match.opponent} in ${match.eventLeague}.\nBracket found <a href="${match.bracket}">here</a>.`;
         if (match.stream) {
             description += `\nStream <a href="${match.stream}">here</a>.`;
         }
@@ -84,9 +84,9 @@ class EventBuilder {
         }
         this.setDescription(description);
 
-        let summary;
+        let summary = '';
         if (this.gCalEvent.general) {
-            summary = `[${match.game.toUpperCase()}] `;
+            summary += `[${match.game.toUpperCase()}] `;
         }
 
         summary += `UCF vs ${match.opponent}`;
