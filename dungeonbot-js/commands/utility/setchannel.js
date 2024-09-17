@@ -32,7 +32,7 @@ async function execute(interaction) {
         interaction.editReply({ content: `Command ${interaction.options.getString('command')} does not exist.`, ephemeral: true });
         return;
     }
-  
+
     let object = {};
     // read file guild folder path
     try {
@@ -45,7 +45,7 @@ async function execute(interaction) {
     object[interaction.options.getString('command').toLowerCase()] = interaction.options.getChannel('channel').id;
     // write to json and reply
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
-    await interaction.editReply(interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'));
+    await interaction.editReply({ content: interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'), ephemeral: true });
 }
 
 module.exports = {
