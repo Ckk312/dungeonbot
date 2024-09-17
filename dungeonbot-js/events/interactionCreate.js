@@ -88,6 +88,7 @@ module.exports = {
             return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
         }
 
+
         // check for role to execute command
         if (interaction.commandName === 'setchannel' || interaction.commandName === 'schedmatch') {
             if (!interaction.member.roles.cache.has(info.TM_ROLE_ID) && !interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
