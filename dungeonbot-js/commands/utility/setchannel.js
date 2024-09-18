@@ -16,6 +16,9 @@ const data = new SlashCommandBuilder()
         option.setName('channel')
             .setRequired(true)
             .setDescription('Pick a channel'))
+    .addBooleanOption(option =>
+        option.setName('delete')
+            .setDescription('Adds to the list of approved channels for this command.'))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 
 async function execute(interaction) {
@@ -29,8 +32,7 @@ async function execute(interaction) {
     }
 
     if (!found) {
-        interaction.editReply({ content: `Command ${interaction.options.getString('command')} does not exist.`, ephemeral: true });
-        return;
+        return interaction.editReply({ content: `Command ${interaction.options.getString('command')} does not exist.`, ephemeral: true });
     }
 
     let object = {};
@@ -41,8 +43,28 @@ async function execute(interaction) {
     } catch (e) {
         console.log('File could not be found.');
     }
+
+    let property = object[interaction.options.getString('command').toLowerCase()];
+
+    if (interaction.options.getBoolean('delete')) {
+        const newIndex = property.indexOf(interaction.options.getString('channel').id);
+        if (newIndex === -1) {
+            property.shift();
+            return interaction.editReply({ content: interaction.options.getChannel('channel').url + ' was not an assigned channel for /' + interaction.options.getString('command'), ephemeral: true });
+        }
+        const replace = property.pop();
+        property[newIndex] = replace;
+        property.shift();
+        return interaction.editReply({ content: interaction.options.getChannel('channel').url + ' has been removed from /' + interaction.options.getString('command'), ephemeral: true });
+    }
+
     // specify the channel id of the command
-    object[interaction.options.getString('command').toLowerCase()] = interaction.options.getChannel('channel').id;
+    if (Array.isArray(property) && !property.includes(interaction.options.getChannel('channel').id)) {
+        property.push(interaction.options.getChannel('channel').id);
+    } else {
+        property = [interaction.options.getChannel('channel').id];
+    }
+
     // write to json and reply
     await fs.writeFile(GUILD_FOLDER_PATH + '/' + interaction.guild.id + '.json', JSON.stringify(object), 'utf8');
     await interaction.editReply({ content: interaction.options.getChannel('channel').url + ' is assigned as the channel for /' + interaction.options.getString('command'), ephemeral: true });

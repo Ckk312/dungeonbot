@@ -73,19 +73,14 @@ module.exports = {
         }
 
         // ensure command is sent in the correct channel
-        if (info[interaction.commandName] !== interaction.channel.id && !info.default) {
+        if (!info[interaction.commandName].includes(interaction.channel.id) && !info.default) {
             timestamps.delete(interaction.user.id);
             return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
         }
-        else if (!info[interaction.commandName] && interaction.channel.id !== info.default) {
+        else if (!info[interaction.commandName].includes(interaction.channel.id) && interaction.channel.id !== info.default) {
             const defaultChannel = await interaction.client.channels.fetch(info.default);
             timestamps.delete(interaction.user.id);
             return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
-        }
-        else if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
-            const newChannel = await interaction.client.channels.fetch(info[interaction.commandName]);
-            timestamps.delete(interaction.user.id);
-            return await interaction.reply({ content: 'This command must be used in ' + newChannel.url, ephemeral: true });
         }
 
         // check for role to execute command
