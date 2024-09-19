@@ -32,7 +32,7 @@ const data = new SlashCommandBuilder()
             .setMaxValue(12))
     .addStringOption(option =>
         option
-            .setName('am-pm1')
+            .setName('am-pm')
             .setDescription('true for pm and false for am')
             .setRequired(true)
             .addChoices(
@@ -126,11 +126,11 @@ module.exports = {
         // determine hour based on am-pm
         let hour = options.getInteger('starthour');
 
-        if (options.getString('am-pm1') === 'pm' && hour < 11) {
+        if (options.getString('am-pm') === 'pm' && hour < 11) {
             hour += 12;
         }
 
-        if (options.getString('am-pm1') === 'am' && hour === 12) {
+        if (options.getString('am-pm') === 'am' && hour === 12) {
             hour = 0;
         }
 

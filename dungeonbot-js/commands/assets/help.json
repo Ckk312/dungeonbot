@@ -19,7 +19,7 @@
                 "required" : true
             },
             {
-                "name" : "am-pm1",
+                "name" : "am-pm",
                 "desc" : "Sets the AM/PM for the hour.",
                 "required" : true
             },
@@ -180,5 +180,9 @@
                 "required" : true
             }
         ]
+    },
+    {
+        "name" : "list",
+        "description" : "Lists today's Dungeon Reservations"
     }
 ]

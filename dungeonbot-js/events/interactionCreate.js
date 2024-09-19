@@ -69,19 +69,31 @@ module.exports = {
         // Add TM_ROLE_ID to json if doesn't exist
         if (!info.TM_ROLE_ID) {
             info['TM_ROLE_ID'] = '770517986826125313';
-            fs.writeFile(COMMAND_CHANNEL_ID_PATH, JSON.stringify(info), 'utf8');
+            try {
+                await fs.writeFile(COMMAND_CHANNEL_ID_PATH, JSON.stringify(info), 'utf8');
+            } catch (error) {
+                return await interaction.reply({ content: 'Unexpected Error has occurred.', ephemeral: true });
+            }
         }
 
         // ensure command is sent in the correct channel
-        if (!info[interaction.commandName].includes(interaction.channel.id) && !info.default) {
-            timestamps.delete(interaction.user.id);
-            return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
+        if (info[interaction.commandName] && Array.isArray(info[interaction.commandName])) {
+            if (!info[interaction.commandName].includes(interaction.channel.id) && !info.default) {
+                timestamps.delete(interaction.user.id);
+                return await interaction.reply({ content: 'This channel is not assigned to this command.', ephemeral: true });
+            }
+            else if (!info[interaction.commandName].includes(interaction.channel.id) && interaction.channel.id !== info.default) {
+                const defaultChannel = await interaction.client.channels.fetch(info.default);
+                timestamps.delete(interaction.user.id);
+                return await interaction.reply({ content: 'This command is not assigned to this command. You can use the default channel, ' + defaultChannel.url, ephemeral: true });
+            }
+        } else {
+            if (interaction.commandName !== 'setchannel' && !info.default) {
+                timestamps.delete(interaction.user.id);
+                return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel" or use the default channel.', ephemeral: true });
+            }
         }
-        else if (!info[interaction.commandName].includes(interaction.channel.id) && interaction.channel.id !== info.default) {
-            const defaultChannel = await interaction.client.channels.fetch(info.default);
-            timestamps.delete(interaction.user.id);
-            return await interaction.reply({ content: 'This command must be used in ' + defaultChannel.url, ephemeral: true });
-        }
+
 
         // check for role to execute command
         if (interaction.commandName === 'setchannel' || interaction.commandName === 'schedmatch') {

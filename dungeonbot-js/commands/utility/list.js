@@ -6,7 +6,7 @@ const data = new SlashCommandBuilder()
     .setDescription('List today\'s events');
 
 module.exports = {
-    cooldown: 300,
+    cooldown: 60,
     data,
     async execute(interaction) {
         sendMessage(interaction.client);
