@@ -42,7 +42,7 @@ module.exports = {
             // check if cooldown has expired
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1_000);
-                return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
+                return await interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
             }
         }
 
@@ -50,30 +50,46 @@ module.exports = {
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
+        // read in the file and if it doesn't exist then create it
         let info;
+        try {
+            const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
+            info = JSON.parse(file);
+        } catch (e) {
+            console.error(e);
+            try {
+                info = {};
+                await fs.writeFile(COMMAND_CHANNEL_ID_PATH, JSON.stringify(info), 'utf8');
+            } catch (error) {
+                return await interaction.reply({ content: 'Unexpected Error has Occurred.', ephemeral: true });
+            }
+        }
+
         // do actions based on command
         switch (interaction.commandName) {
             case 'schedmatch':
-                try {
-                    const file = await fs.readFile(COMMAND_CHANNEL_ID_PATH);
-                    info = JSON.parse(file);
-                } catch (e) {
-                    interaction.reply({ content: 'Set a command channel for this command using "/setchannel"', ephemeral: true });
-                    console.error(e);
-                    return;
+                if (!info.schedmatch) {
+                    return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
                 }
 
-                if (!interaction.member.roles.cache.has('899044671119061072')) {
-                    interaction.reply({ content: 'You do not have the "Title Manager" role to complete this command.', ephemeral: true });
-                    return;
+                if (!info.TM_ROLE_ID) {
+                    info['TM_ROLE_ID'] = '899044671119061072';
                 }
 
                 if (info[interaction.commandName] != interaction.channel.id) {
-                    interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
-                    return;
+                    return await interaction.reply({ content: 'This channel is not specified for this command.', ephemeral: true });
                 }
+
+                if (!interaction.member.roles.cache.has(info.TM_ROLE_ID)) {
+                    return await interaction.reply({ content: 'You do not have the "Title Manager" role to complete this command.', ephemeral: true });
+                }
+
                 break;
             default:
+                if (info[interaction.commandName] && info[interaction.commandName] != interaction.channel.id) {
+                    return await interaction.reply({ content: 'An admin must set a channel for this command using "/setchannel"', ephemeral: true });
+                }
+
                 break;
         }
 
@@ -82,7 +98,7 @@ module.exports = {
             await command.execute(interaction);
         } catch (error) {
             console.error(error);
-            if (!interaction.replied) {
+            if (!interaction.replied && !interaction.deferred) {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral : true });
             } else {
                 await interaction.editReply('There was an error while executing this command!');
