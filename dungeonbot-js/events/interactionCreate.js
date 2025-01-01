@@ -13,10 +13,10 @@ module.exports = {
         // only consider ChatInputCommands
         if (!interaction.isChatInputCommand()) return;
 
-        // log every command available in this client
+        /* log every command available in this client
         for (const command of interaction.client.commands) {
             console.log(command);
-        }
+        }*/
 
         // retrieve command from list with same name
         const command = interaction.client.commands.get(interaction.commandName);

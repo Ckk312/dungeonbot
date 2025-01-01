@@ -14,8 +14,11 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
+    "@napi-rs/canvas": "^0.1.65",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
-    "googleapis": "^105.0.0"
+    "googleapis": "^105.0.0",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7"
   }
 }
