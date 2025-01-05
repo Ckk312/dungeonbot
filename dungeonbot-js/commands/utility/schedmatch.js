@@ -1,33 +1,9 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
-const { createEvent } = require('../../googlecalendar/utility/eventcreate.js');
+const createEvent = require('../../googlecalendar/utility/eventcreate.js');
 const { authorize } = require('../../googlecalendar/googleapi.js');
-const fs = require('fs').promises;
-const path = require('path');
-const process = require('process');
-
-const TITLE_ASSETS_PATH = path.join(process.cwd(), './commands/assets/titleassets.json');
-
-/**
- * Load json file from path and get object
- *
- * @param { string } title name of title
- * @returns { Object }
- */
-async function loadTitleAssets(title) {
-    try {
-        const file = await fs.readFile(TITLE_ASSETS_PATH);
-        const assets = JSON.parse(file);
-        if (assets[title]) {
-            return assets[title];
-        } else {
-            throw new Error('Could not load object with name: ' + title);
-        }
-    } catch (e) {
-        console.log(e);
-        return null;
-    }
-}
+const MatchTag = require('../../models.js');
+const loadTitleAssets = require('../assets/loadassets.js');
 
 // slash command
 const data = new SlashCommandBuilder()
@@ -149,7 +125,7 @@ async function execute(interaction) {
 
     // use the date and rest of information to construct matchInfo object
     const matchInfo = {
-        date: date.toISOString(),
+        date: date,
         game: interaction.options.getString('game'),
         team: interaction.options.getString('team'),
         title: interaction.options.getString('title'),
@@ -237,7 +213,9 @@ async function execute(interaction) {
         const eventExist = await authorize().then((a) => {
             info.auth = a;
             return info;
-        }).then(createEvent).catch(console.error);
+        }).then(createEvent).then((newEvent) => {
+            matchInfo.eventId1 = newEvent.data.id;
+        }).catch(console.error);
 
         // post to specific games' calendar
         info.calendarId = assets.calendar;
@@ -246,7 +224,11 @@ async function execute(interaction) {
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
         info.eventResource = eb.toJSON();
-        await createEvent(info).catch(console.error);
+        const newEvent = await createEvent(info).catch(console.error);
+        matchInfo.eventId2 = newEvent.data.id;
+
+        const dbMatch = await MatchTag.create(matchInfo);
+        console.log(dbMatch.get('matchId'));
 
         // respond based on google calendar api
         if (eventExist) {
@@ -267,7 +249,7 @@ async function execute(interaction) {
                     { name: 'Bracket', value: matchInfo.bracket, inline: true },
                     { name: '\u200B', value: '\u200B' },
                 )
-                .setFooter({ text: 'Created by ' + interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+                .setFooter({ text: 'Created by ' + interaction.user.username + '\nID: ' + dbMatch.get('matchId'), iconURL: interaction.user.displayAvatarURL() })
                 .setTimestamp();
             if (matchInfo.stream) {
                 matchEmbed.addFields(
@@ -310,7 +292,7 @@ async function execute(interaction) {
 }
 
 module.exports = {
-    cooldown: 60,
+    cooldown: 15,
     data,
     execute,
 };

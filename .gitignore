@@ -99,3 +99,6 @@ dungeonbot-js/googlecalendar/credentials.json
 
 # hidden directories
 dungeonbot-js/commands/guilds/
+
+# DATABASE
+database.sqlite
