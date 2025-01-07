@@ -11,7 +11,7 @@ async function createEvent(info) {
     // create calendar instance
     const calendar = google.calendar({ version: 'v3', auth: info.auth });
     // insert event into calendar
-    return calendar.events.insert({
+    return await calendar.events.insert({
         auth: info.auth,
         calendarId: info.calendarId,
         resource: info.eventResource,

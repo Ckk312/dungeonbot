@@ -156,7 +156,8 @@ async function execute(interaction) {
             date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), timeNums[0], timeNums[1], 0, 0);
         }
 
-        eventInfo.date = date.toString();
+        eventInfo.date = date;
+        eventInfo.dateUNIX = date.getTime() / 1000;
         reply += '\nDate/Time: ' + eventInfo.date;
         reply += '\nEvent/League: ';
         eventInfo.eventLeague = options.getString('event-league') || eventInfo.eventLeague;

@@ -30,6 +30,10 @@ const MatchTag = sequelize.define('match', {
         type: Sequelize.DATE,
         allowNull: false,
     },
+    dateUNIX: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+    },
     title: Sequelize.STRING,
     eventLeague: {
         type: Sequelize.STRING,

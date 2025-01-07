@@ -91,6 +91,7 @@ async function execute(interaction) {
 
             await confirmation.update({ embeds: [embed], components: [row] });
         } catch (e) {
+            console.error(e);
             await interaction.deleteReply();
             return;
         }

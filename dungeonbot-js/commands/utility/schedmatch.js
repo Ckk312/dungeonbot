@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const { EventBuilder } = require('../../googlecalendar/utility/eventbuilder.js');
 const createEvent = require('../../googlecalendar/utility/eventcreate.js');
-const { authorize } = require('../../googlecalendar/googleapi.js');
+const { authorize, reauth } = require('../../googlecalendar/googleapi.js');
 const MatchTag = require('../../models.js');
 const loadTitleAssets = require('../assets/loadassets.js');
 
@@ -215,7 +215,11 @@ async function execute(interaction) {
             return info;
         }).then(createEvent).then((newEvent) => {
             matchInfo.eventId1 = newEvent.data.id;
-        }).catch(console.error);
+            return newEvent;
+        }).catch((e) => {
+            console.error(e);
+            reauth();
+        });
 
         // post to specific games' calendar
         info.calendarId = assets.calendar;
@@ -224,9 +228,13 @@ async function execute(interaction) {
             .setStartTime(date.toISOString())
             .setEndTime(newDate.toISOString());
         info.eventResource = eb.toJSON();
-        const newEvent = await createEvent(info).catch(console.error);
+        const newEvent = await createEvent(info).catch((e) => {
+            console.error(e);
+            reauth();
+        });
         matchInfo.eventId2 = newEvent.data.id;
 
+        matchInfo.dateUNIX = matchInfo.date.getTime() / 1000;
         const dbMatch = await MatchTag.create(matchInfo);
         console.log(dbMatch.get('matchId'));
 
