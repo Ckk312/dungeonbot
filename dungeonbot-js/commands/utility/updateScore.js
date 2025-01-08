@@ -13,7 +13,7 @@ const data = new SlashCommandBuilder()
     .addIntegerOption(option =>
         option
             .setName('ucf-score')
-            .setDescription('The UCF team\'s score (if in a multi-opponent event, list your win record here')
+            .setDescription('The UCF team\'s score (if in a multi-opponent event, list your win record here)')
             .setRequired(true),
         )
     .addIntegerOption(option =>

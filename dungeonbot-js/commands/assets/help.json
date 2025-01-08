@@ -184,5 +184,202 @@
     {
         "name" : "list",
         "description" : "Lists today's Dungeon Reservations"
+    },
+    {
+        "name" : "editmatch",
+        "description" : "Edits a match using a match id",
+        "fields" : [
+            {
+                "name" : "match-id",
+                "desc" : "Id of the match you would like to edit",
+                "required" : true
+            },
+            {
+                "name" : "game",
+                "desc" : "Sets the game of the event.",
+                "choices" : [
+                    "Apex Legends",
+                    "Call of Duty",
+                    "Counterstrike",
+                    "League of Legends",
+                    "Overwatch",
+                    "Rainbow Six: Siege",
+                    "Rocket League",
+                    "Splatoon",
+                    "Super Smash Bros.",
+                    "VALORANT"
+                ]
+            },
+            {
+                "name" : "team",
+                "desc" : "Specifies what type of team is playing.",
+                "choices" : [
+                    "UCF Knights",
+                    "UCF Knights Academy",
+                    "UCF Knights Gold",
+                    "UCF Knights Black",
+                    "UCF Knights White"
+                ]
+            },
+            {
+                "name" : "date",
+                "desc" : "Date to be changed. mm/dd/yy format"
+            },
+            {
+                "name" : "time",
+                "desc" : "Time to be changed. hh:mm format"
+            },
+            {
+                "name" : "title",
+                "desc" : "Sets the title of the event."
+            },
+            {
+                "name" : "event-league",
+                "desc" : "Sets the event or league of the event."
+            },
+            {
+                "name" : "opponent",
+                "desc" : "Sets the opposing University of the event."
+            },
+            {
+                "name" : "bracket-link",
+                "desc" : "Sets the link of the bracket of the event."
+            },
+            {
+                "name" : "stream-link",
+                "desc" : "Sets the link of the stream of the event."
+            },
+            {
+                "name" : "opponent-socials",
+                "desc" : "Sets the socials of the opponent."
+            },
+            {
+                "name" : "hashtag",
+                "desc" : "Sets the hashtags of the event."
+            }
+        ]
+    },
+    {
+        "name" : "deletematch",
+        "description" : "Deletes a match using a match id",
+        "fields" : [
+            {
+                "name" : "match-id",
+                "desc" : "The id of the match to be deleted",
+                "required" : true
+            }
+        ]
+    },
+    {
+        "name" : "update-score",
+        "description" : "Updates the score of an existing match",
+        "fields" : [
+            {
+                "name" : "match-id",
+                "desc" : "The id of the match to be updated",
+                "required" : true
+            },
+            {
+                "name" : "ucf-score",
+                "desc" : "The UCF team's score (if in a multi-opponent event, list your win record here)",
+                "required" : true
+            },
+            {
+                "name" : "opponent-score",
+                "desc" : "Score of opponents (if in a multi-opponent event, list your loss record here)"
+            },
+            {
+                "name" : "is-victory",
+                "desc" : "Specify true if UCF won this event overall (leave empty for singular opponent matches)"
+            }
+        ]
+    },
+    {
+        "name" : "list-matches",
+        "description" : "Lists matches given a search query",
+        "fields" : [
+            {
+                "name" : "match-id",
+                "desc" : "Id of the match you would like to search",
+                "required" : true
+            },
+            {
+                "name" : "game",
+                "desc" : "Searches for matches by game.",
+                "choices" : [
+                    "Apex Legends",
+                    "Call of Duty",
+                    "Counterstrike",
+                    "League of Legends",
+                    "Overwatch",
+                    "Rainbow Six: Siege",
+                    "Rocket League",
+                    "Splatoon",
+                    "Super Smash Bros.",
+                    "VALORANT"
+                ]
+            },
+            {
+                "name" : "team",
+                "desc" : "Searches for what team is playing.",
+                "choices" : [
+                    "UCF Knights",
+                    "UCF Knights Academy",
+                    "UCF Knights Gold",
+                    "UCF Knights Black",
+                    "UCF Knights White"
+                ]
+            },
+            {
+                "name" : "before-date",
+                "desc" : "Searches for matches before this date. mm/dd/yy format"
+            },
+            {
+                "name" : "after-date",
+                "desc" : "Searches for matches after this date. mm/dd/yy format"
+            },
+            {
+                "name" : "title",
+                "desc" : "Searches for the title of the event."
+            },
+            {
+                "name" : "event-league",
+                "desc" : "Searches for the event or league of the event."
+            },
+            {
+                "name" : "opponent",
+                "desc" : "Searches for the opposing University of the event."
+            },
+            {
+                "name" : "is-win",
+                "desc" : "Searches by matches that are win or loss depending on input"
+            }
+        ]
+    },
+    {
+        "name": "template yt-stream-thumbnail",
+        "description" : "Generates an image using information given for a youtube stream thumbnail",
+        "fields" : [
+            {
+                "name" : "bg-image",
+                "desc" : "Background image for template. Must be 16:9",
+                "required" : true
+            },
+            {
+                "name" : "title",
+                "desc" : "Competition being played in and the game",
+                "required" : true
+            },
+            {
+                "name" : "opponent",
+                "desc" : "Name of opponent",
+                "required" : true
+            },
+            {
+                "name" : "opponent-logo",
+                "desc" : "Opponents logo",
+                "required" : true
+            }
+        ]
     }
 ]

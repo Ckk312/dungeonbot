@@ -20,7 +20,11 @@ function createEmbed(command, bot, curPage, length) {
                 embed.addFields({ name: ' ', value: ' ' });
                 i++;
             }
-            embed.addFields({ name: field.name, value: field.desc + '\n**REQUIRED:** ' + field.required, inline: true });
+            let valStr = field.desc;
+            if (field.required) {
+                valStr += '\n**REQUIRED**';
+            }
+            embed.addFields({ name: field.name, value: valStr, inline: true });
             i++;
         }
     }
