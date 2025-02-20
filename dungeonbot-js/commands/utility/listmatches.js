@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType } = require('discord.js');
 const MatchTag = require('../../models');
 const { Sequelize } = require('sequelize');
 
@@ -94,15 +94,15 @@ async function execute(interaction) {
         searchStr += ` "${interaction.options.getString('game')}",`;
     }
 
-    const { gte, lte, and } = Sequelize.Op;
+    const { gt, lt, between } = Sequelize.Op;
     let lteDate;
     if (interaction.options.getString('before-date')) {
         if (dateRegex.test(interaction.options.getString('before-date'))) {
             const dateStrings = interaction.options.getString('before-date').split('/');
             const dateNums = dateStrings.map((d) => Number(d));
-            lteDate = new Date(2000 + dateNums[0], dateNums[2] - 1, dateNums[1]).getTime() / 1000;
+            lteDate = new Date(2000 + dateNums[2], dateNums[1] - 1, dateNums[0]).getTime() / 1000;
             options.where.dateUNIX = {
-                [lte]: lteDate,
+                [lt]: lteDate,
             };
             searchStr += ` "before ${interaction.options.getString('before-date')}",`;
         } else {
@@ -115,19 +115,17 @@ async function execute(interaction) {
         if (dateRegex.test(interaction.options.getString('after-date'))) {
             const dateStrings = interaction.options.getString('after-date').split('/');
             const dateNums = dateStrings.map((d) => Number(d));
-            const gteDate = new Date(2000 + dateNums[0], dateNums[2] - 1, dateNums[1]).getTime() / 1000;
+            const gteDate = new Date(2000 + dateNums[2], dateNums[0] - 1, dateNums[1]).getTime() / 1000;
             if (lteDate) {
                 options.where.dateUNIX = undefined;
                 options.where = {
                     ...options.where,
-                    [and]: [
-                        { dateUNIX: { [gte]: gteDate } },
-                        { dateUNIX: { [lte]: lteDate } },
-                    ],
+                    dateUNIX: { [between]: [gteDate, lteDate] },
                 };
             } else {
-                options.where.dateUNIX = { [gte]: gteDate };
+                options.where.dateUNIX = { [gt]: gteDate };
             }
+            console.log(options.where);
             searchStr += ` "after ${interaction.options.getString('after-date')}",`;
         } else {
             await interaction.editReply({ content: 'Incorrect date format' });
@@ -136,7 +134,8 @@ async function execute(interaction) {
     }
 
     if (!interaction.options.getString('after-date') && !interaction.options.getString('before-date')) {
-        options.where.dateUNIX = { [gte]: new Date((new Date().getFullYear()), 0, 1, 0, 0, 0, 0).getTime() / 1000 };
+        console.log('boop');
+        options.where.dateUNIX = { [gt]: new Date((new Date().getFullYear()), 0, 1, 0, 0, 0, 0).getTime() / 1000 };
     }
 
     if (interaction.options.getString('title')) {
@@ -184,8 +183,13 @@ async function execute(interaction) {
         new ButtonBuilder()
             .setCustomId('right')
             .setLabel('▶')
-            .setStyle(ButtonStyle.Primary),
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(false),
     ];
+
+    if (count > 10) {
+        buttons[1].setDisabled(false);
+    }
 
     const confirmationRow = new ActionRowBuilder()
         .addComponents(buttons[0], buttons[1]);
@@ -195,59 +199,53 @@ async function execute(interaction) {
         components: [confirmationRow],
     });
 
-    let confirmation;
-    try {
-        confirmation = await response.awaitMessageComponent({ filter: null, time: 300_000 });
-    } catch (e) {
-        console.error(e);
+    const filter = i => i.user.id === interaction.user.id;
+
+    const collector = await response.createMessageComponentCollector({ filter, componentType: ComponentType.Button, idle: 300_000 });
+
+    collector.on('collect', async button => {
+        // left button case
+        if (button?.customId === 'left') {
+            if (offset >= 10) {
+                offset -= 10;
+                buttons[1].setDisabled(false);
+            }
+
+            if (offset === 0) {
+                buttons[0].setDisabled(true);
+            } else {
+                buttons[0].setDisabled(false);
+            }
+        }
+
+        // right button case
+        else if (button?.customId === 'right') {
+            if ((offset + 10) < count) {
+                offset += 10;
+                buttons[0].setDisabled(false);
+            }
+
+            if ((offset + 10) >= count) {
+                buttons[1].setDisabled(true);
+            } else {
+                buttons[1].setDisabled(false);
+            }
+        }
+
+        options.offset = offset;
+
+        result = await MatchTag.findAndCountAll(options);
+
+        await button?.update({
+            embeds: [matchEmbed(result, searchStr, count, buttons, offset)],
+            components: [confirmationRow],
+        });
+    });
+
+    collector.once('dispose', async () => {
         await interaction.deleteReply();
         return;
-    }
-
-    // confirm button case
-    if (confirmation?.customId === 'left') {
-        if (offset >= 10) {
-            offset -= 10;
-            buttons[1].setDisabled(false);
-        }
-
-        if (offset === 0) {
-            buttons[0].setDisabled(true);
-        } else {
-            buttons[0].setDisabled(false);
-        }
-
-        options.offset = offset;
-
-        result = await MatchTag.findAndCountAll(options);
-
-        await confirmation.update({
-            embeds: [matchEmbed(result, searchStr, count, buttons, offset)],
-            components: [confirmationRow],
-        });
-    }
-
-    else if (confirmation?.customId === 'right') {
-        if ((offset + 10) <= count) {
-            offset += 10;
-            buttons[0].setDisabled(false);
-        }
-
-        if ((offset + 10) > count) {
-            buttons[1].setDisabled(true);
-        } else {
-            buttons[1].setDisabled(false);
-        }
-
-        options.offset = offset;
-
-        result = await MatchTag.findAndCountAll(options);
-
-        await confirmation.update({
-            embeds: [matchEmbed(result, searchStr, count, buttons, offset)],
-            components: [confirmationRow],
-        });
-    }
+    });
 }
 
 function matchEmbed(matches, desc, count, buttons, offset) {
@@ -296,7 +294,7 @@ function matchEmbed(matches, desc, count, buttons, offset) {
         });
     }
 
-    embed.setFooter({ text: `Displaying ${offset + matches.count} of ${count}` });
+    embed.setFooter({ text: `Displaying ${offset}-${offset + 10 < count ? offset + 10 : count} of ${count}` });
 
     return embed;
 }
