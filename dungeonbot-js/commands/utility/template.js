@@ -100,7 +100,7 @@ async function execute(interaction) {
         context.fillText('v', (img.width * 0.09), (img.height * 0.085));
 
         const ratio = opponentLogo.width / opponentLogo.height;
-        context.drawImage(opponentLogo, (img.width * 0.15), (img.height * 0.025), (img.height * 0.1 * ratio), (img.height * 0.1));
+        context.drawImage(opponentLogo, (img.width * 0.15), (img.height * 0.02), (img.height * 0.1 * ratio), (img.height * 0.1));
     }
 
     const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'yt-thumbnail-template.png' });

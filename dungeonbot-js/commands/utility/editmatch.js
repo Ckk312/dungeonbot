@@ -109,6 +109,7 @@ async function execute(interaction) {
             assets = await loadTitleAssets(options.getString('game'));
             eventInfo.game = options.getString('game');
             reply += 'Game: ' + assets.fullName;
+            eventInfo.fullName = assets.fullName;
         } else {
             assets = await loadTitleAssets(eventInfo.game);
         }

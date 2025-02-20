@@ -95,7 +95,7 @@ function findCurrentDifference() {
 
 async function sendMessage(client) {
     if (!client) {
-        return;
+        return false;
     }
 
     const date = new Date();
@@ -112,6 +112,7 @@ async function sendMessage(client) {
     } catch (e) {
         console.error(e);
         await reauth();
+        return false;
     }
 
     const channel = await client
@@ -119,6 +120,8 @@ async function sendMessage(client) {
         .cache
         .get('1144375225488769069');
     channel.send(newMessage);
+
+    return true;
 }
 
 /**

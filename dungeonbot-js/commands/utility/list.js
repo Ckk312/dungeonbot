@@ -9,7 +9,10 @@ module.exports = {
     cooldown: 60,
     data,
     async execute(interaction) {
-        sendMessage(interaction.client);
-        await interaction.reply({ content: 'Message sent.', ephemeral: true });
+        const reply = { content: 'An error has occurred.', ephemeral: true };
+        if (sendMessage(interaction.client)) {
+            reply.content = 'Message sent';
+        }
+        await interaction.reply(reply);
     },
 };
